@@ -1,0 +1,947 @@
+
+[
+  {
+    "name": "Kumartuli Park Sarbojanin Durgotsav",
+    "latitude": 22.599004323681577,
+    "longitude": 88.36149908568059,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Maharaja Nabakrishna Dev’s Palace",
+    "latitude": 22.597115458482325,
+    "longitude": 88.36697771826393,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Hatkhola Gosaipara Sarbojonin Durgotsab",
+    "latitude": 22.59911141298696,
+    "longitude": 88.3593209087833,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Bagbazar Sarbojanin Durgotsav",
+    "latitude": 22.604496530593398,
+    "longitude": 88.36563342606182,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Sovabazar Rajbari Durga Puja",
+    "latitude": 22.5962753669131,
+    "longitude": 88.36741037840571,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Hatibagan Sarbojonin",
+    "latitude": 22.594395196871364,
+    "longitude": 88.37202141756765,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Hatibagan Nabin Pally Durga Puja",
+    "latitude": 22.595963036449245,
+    "longitude": 88.37353249424272,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Jagat Mukherjee Park Durga Puja",
+    "latitude": 22.599527055122874,
+    "longitude": 88.36620817600209,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Ahiritola Sarbojanin Durgotsab",
+    "latitude": 22.594766895286245,
+    "longitude": 88.35708100608308,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Chorebagan Sarbojonin",
+    "latitude": 22.583446975928226,
+    "longitude": 88.36307086152753,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Ahiritola Jubak Brinda Durgapuja",
+    "latitude": 22.594605213607284,
+    "longitude": 88.36034433854566,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Sovabazar Beniatola Sarbojanin Durgotsab Samity",
+    "latitude": 22.59573222589733,
+    "longitude": 88.36122349262443,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Kashi Bose Lane Sarbojonin",
+    "latitude": 22.5909085362943,
+    "longitude": 88.36895302704968,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Sealdah Railway Athletic Club",
+    "latitude": 22.570597456941755,
+    "longitude": 88.37195493951957,
+    "type": "regular",
+    "zone": "Central",
+    "bonedi": false
+  },
+  {
+    "name": "College Square Sarbojonin Durgotsab Committee",
+    "latitude": 22.574542935779455,
+    "longitude": 88.36449428785404,
+    "type": "popular",
+    "zone": "Central",
+    "bonedi": false
+  },
+  {
+    "name": "Muhammad Ali Park",
+    "latitude": 22.57725081322534,
+    "longitude": 88.36093902761098,
+    "type": "popular",
+    "zone": "Central",
+    "bonedi": false
+  },
+  {
+    "name": "Santosh Mitra Square",
+    "latitude": 22.566072611051812,
+    "longitude": 88.36583674002729,
+    "type": "popular",
+    "zone": "Central",
+    "bonedi": false
+  },
+  {
+    "name": "Manicktala Chaltabagan Lohapatty Durga Puja",
+    "latitude": 22.584899448573335,
+    "longitude": 88.3721739327032,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Tala Barowari Durga Puja",
+    "latitude": 22.607177978917825,
+    "longitude": 88.37595446517149,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Tala Prattoy Durga Puja",
+    "latitude": 22.608886729784345,
+    "longitude": 88.38295664734508,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Brindaban Matri Mandir Durga Puja",
+    "latitude": 22.582729058175293,
+    "longitude": 88.37292741983963,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Karbagan Sarbojanin Durgotsab Committee",
+    "latitude": 22.595376329707804,
+    "longitude": 88.38383800223508,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Nimtala Sarbojanin DurgaPuja",
+    "latitude": 22.591862023906398,
+    "longitude": 88.35875920754867,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Telenga Bagan Sarbojanin Durgotsab",
+    "latitude": 22.59495437687142,
+    "longitude": 88.38533469466387,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Ultadanga Pallyshree Durga Puja",
+    "latitude": 22.595925359699667,
+    "longitude": 88.38455761003999,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Ultadanga Yuba Brinda Durga Puja",
+    "latitude": 22.59592605850974,
+    "longitude": 88.38236048294908,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Pathuriaghata Pancher Pally Sarbojonin Durgotsab",
+    "latitude": 22.58864851265685,
+    "longitude": 88.35769599624449,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Pathuriaghata Khelat Ghosh Durga Puja",
+    "latitude": 22.588744730077003,
+    "longitude": 88.35660788383798,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Sree Bhumi Sporting Club Durga Puja",
+    "latitude": 22.600400614688294,
+    "longitude": 88.40271375351911,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Dakshindari Youth",
+    "latitude": 22.59531927854495,
+    "longitude": 88.39386919996768,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Dum Dum Park Tarun Sangha Durga Puja",
+    "latitude": 22.610971562288054,
+    "longitude": 88.41370336710246,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Dum Dum Park Yubak Brinda",
+    "latitude": 22.60566465480967,
+    "longitude": 88.41814472275209,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Dum Dum Park Bharat Chakra",
+    "latitude": 22.61085766415742,
+    "longitude": 88.41508202252886,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Dum dum Tarun Dal",
+    "latitude": 22.611221642641112,
+    "longitude": 88.4183865040526,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Dum Dum Park Sarbojanin Durga Puja",
+    "latitude": 22.609483953098522,
+    "longitude": 88.41650230495638,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Vivekananda Children's Park",
+    "latitude": 22.600668551343354,
+    "longitude": 88.40684728537335,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Lake Town Adhibasi Brinda",
+    "latitude": 22.604455882446423,
+    "longitude": 88.40405850100746,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Netaji Sporting Club Durga Puja",
+    "latitude": 22.608348013308724,
+    "longitude": 88.40041576017661,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Aurobinda Setu Sarbajanin Durgatsab",
+    "latitude": 22.59450080051418,
+    "longitude": 88.38057902407705,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Nawpara Dada Bhai Sangha",
+    "latitude": 22.641681877078938,
+    "longitude": 88.38869396370829,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Nalin Sarkar Street Sarbojanin Durgotsab",
+    "latitude": 22.59470374409441,
+    "longitude": 88.37438959721898,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Sikdar Bagan Sadharan Durga Puja",
+    "latitude": 22.596624298134145,
+    "longitude": 88.37217640131645,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Mitali Sangha Durga Puja Pandal",
+    "latitude": 22.58000548718583,
+    "longitude": 88.39423201097019,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Beliaghata 33 Pally",
+    "latitude": 22.568567231501703,
+    "longitude": 88.39114976748122,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Bidhan Sarani Atlas Club",
+    "latitude": 22.59969417125555,
+    "longitude": 88.37294027792677,
+    "type": "regular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Azad Hind Bag Hedua Park Durga Puja",
+    "latitude": 22.58873465535328,
+    "longitude": 88.36933441525179,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Simla Byam Samity Durga Puja",
+    "latitude": 22.58515850067709,
+    "longitude": 88.36456309238216,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": false
+  },
+  {
+    "name": "Chakraberia Sarbojanin Durgotsab",
+    "latitude": 22.533686492015228,
+    "longitude": 88.35194363160609,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Ekdalia Evergreen Club",
+    "latitude": 22.521709254884193,
+    "longitude": 88.36658435313632,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Deshapriya Park Sarbojanin Puja",
+    "latitude": 22.51945760636264,
+    "longitude": 88.35327433862294,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Suruchi Sangha",
+    "latitude": 22.509312558917756,
+    "longitude": 88.33402729731628,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Chetla Agrani Club Durga Puja",
+    "latitude": 22.516382181897086,
+    "longitude": 88.33683679112775,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Badamtala Ashar Sangha Durga Puja",
+    "latitude": 22.518313659342198,
+    "longitude": 88.34382105498862,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Hindusthan Park Sarbojanin Durga Puja",
+    "latitude": 22.517976505755037,
+    "longitude": 88.36212523964441,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Tridhara Sammilani Durga Puja",
+    "latitude": 22.521016745832142,
+    "longitude": 88.35526434176728,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Bakul Bagan Sarbojanin Durgotsav",
+    "latitude": 22.52684225882937,
+    "longitude": 88.34827568167023,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Mudiali Club Durga Puja Pandal",
+    "latitude": 22.510362473602854,
+    "longitude": 88.34630146662785,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Maddox Square Durga Pujo",
+    "latitude": 22.526580422772305,
+    "longitude": 88.3546394219711,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Jodhpur Park Durga Puja",
+    "latitude": 22.504512143118095,
+    "longitude": 88.36555367768963,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "95 Pally",
+    "latitude": 22.508247766131404,
+    "longitude": 88.36279119865394,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Babubagan Durgostav",
+    "latitude": 22.507997060685852,
+    "longitude": 88.36859328645795,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Mudiali Club",
+    "latitude": 22.508997922962266,
+    "longitude": 88.33398978578819,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "State Bank Park",
+    "latitude": 22.467785353122263,
+    "longitude": 88.30909675017779,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "25 Pally Park",
+    "latitude": 22.539395858652373,
+    "longitude": 88.32708715714418,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Singhi Park",
+    "latitude": 22.522026631832343,
+    "longitude": 88.3641462957319,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Sabarna Roy Chowdhury Aatchala Durga",
+    "latitude": 22.47989333154468,
+    "longitude": 88.3064556533944,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": true
+  },
+  {
+    "name": "Barisha Club Durga Puja",
+    "latitude": 22.481463807772123,
+    "longitude": 88.31354305840472,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Barisha Friends Club",
+    "latitude": 22.477229631488623,
+    "longitude": 88.31462336906304,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Ajeya Sanghati Club",
+    "latitude": 22.48088589307491,
+    "longitude": 88.33781119894233,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Naktala Udayan Sangha",
+    "latitude": 22.47430486247333,
+    "longitude": 88.36663173456066,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Behala Buroshibtola Janakalyan Sangha",
+    "latitude": 22.50402009448235,
+    "longitude": 88.33070454596064,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Behala Natun Sangha",
+    "latitude": 22.501674633013586,
+    "longitude": 88.31945925090795,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "64 Pally Durga Pujo",
+    "latitude": 22.52057034701088,
+    "longitude": 88.34759958763397,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Rajdanga Naba Uday Sangha",
+    "latitude": 22.516759525444638,
+    "longitude": 88.39043320567335,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Bosepukur Sitala Mandir",
+    "latitude": 22.519232110426078,
+    "longitude": 88.38488167888958,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Talbagan Durga Puja Area",
+    "latitude": 22.518874757723363,
+    "longitude": 88.38286848764352,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Ballygunge Cultural Association",
+    "latitude": 22.515935090139283,
+    "longitude": 88.35574421601353,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Shiv Mandir Sarbajanin Durgapuja",
+    "latitude": 22.51085556098202,
+    "longitude": 88.3494457028964,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "95 Pally Association",
+    "latitude": 22.50824988557184,
+    "longitude": 88.36278905084005,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Behala Nutan Dal",
+    "latitude": 22.500230463289522,
+    "longitude": 88.32024093699908,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "74 Pally Club",
+    "latitude": 22.53966519961443,
+    "longitude": 88.32521340622819,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": false
+  },
+  {
+    "name": "Jagat Ram Mukherjee Durga Puja (Sonar Durga)",
+    "latitude": 22.499833540550398,
+    "longitude": 88.31459079582505,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": true
+  },
+  {
+    "name": "Amarendra Bhavan Durga Puja (Roy House Puja)",
+    "latitude": 22.501638654178585,
+    "longitude": 88.31891413354822,
+    "type": "popular",
+    "zone": "South",
+    "bonedi": true
+  },
+  {
+    "name": "Shyampukur Adi Sarbojanin Durgotsab Committee",
+    "latitude": 22.598190654877786,
+    "longitude": 88.37081257236747,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Badan Chandra Roy Family Durga Puja",
+    "latitude": 22.57486399504245,
+    "longitude": 88.35796169276955,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Ramgopal Saha Bari Durga Puja",
+    "latitude": 22.56453559355087,
+    "longitude": 88.36217501012752,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Narasingha Daw Family Durga Puja",
+    "latitude": 22.58618980051765,
+    "longitude": 88.35951072748902,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Harakutir Ray-Banerjee Barir Durga Pujo",
+    "latitude": 22.588630700183742,
+    "longitude": 88.35759047761437,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Chhatu Babu Latu Babu Durga Puja",
+    "latitude": 22.59034255660549,
+    "longitude": 88.3645181361254,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Saha Family Durga Puja",
+    "latitude": 22.585628538780313,
+    "longitude": 88.37116508433242,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Rani Rashmoni Family Durga Puja",
+    "latitude": 22.562497062468914,
+    "longitude": 88.35534192415409,
+    "type": "popular",
+    "zone": "North",
+    "bonedi": true
+  },
+  {
+    "name": "Thanthania Dutta Bari",
+    "latitude": 22.580725433193646,
+    "longitude": 88.36579490608436,
+    "type": "popular",
+    "zone": "Central",
+    "bonedi": true
+  },
+  {
+    "name": "Kavi Subhash Metro Station",
+    "latitude": 22.4702,
+    "longitude": 88.4086,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Shahid Khudiram Metro Station",
+    "latitude": 22.4776,
+    "longitude": 88.4143,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Kavi Nazrul Metro Station",
+    "latitude": 22.4853,
+    "longitude": 88.4201,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Gitanjali Metro Station",
+    "latitude": 22.492,
+    "longitude": 88.384,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Masterda Surya Sen Metro Station",
+    "latitude": 22.498,
+    "longitude": 88.379,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Netaji Metro Station",
+    "latitude": 22.504,
+    "longitude": 88.373,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Mahanayak Uttam Kumar Metro Station",
+    "latitude": 22.51,
+    "longitude": 88.368,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Rabindra Sarobar Metro Station",
+    "latitude": 22.514,
+    "longitude": 88.362,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Kalighat Metro Station",
+    "latitude": 22.522,
+    "longitude": 88.349,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Jatin Das Park Metro Station",
+    "latitude": 22.529,
+    "longitude": 88.351,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Netaji Bhavan Metro Station",
+    "latitude": 22.537,
+    "longitude": 88.35,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Rabindra Sadan Metro Station",
+    "latitude": 22.544,
+    "longitude": 88.35,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Maidan Metro Station",
+    "latitude": 22.553,
+    "longitude": 88.35,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Park Street Metro Station",
+    "latitude": 22.558,
+    "longitude": 88.352,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Esplanade Metro Station",
+    "latitude": 22.566,
+    "longitude": 88.353,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Chandni Chowk Metro Station",
+    "latitude": 22.571,
+    "longitude": 88.356,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Central Metro Station",
+    "latitude": 22.576,
+    "longitude": 88.36,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Mahatma Gandhi Road Metro Station",
+    "latitude": 22.582,
+    "longitude": 88.364,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Girish Park Metro Station",
+    "latitude": 22.589,
+    "longitude": 88.367,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Sovabazar Sutanuti Metro Station",
+    "latitude": 22.596,
+    "longitude": 88.37,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Shyambazar Metro Station",
+    "latitude": 22.601,
+    "longitude": 88.372,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Belgachia Metro Station",
+    "latitude": 22.608,
+    "longitude": 88.38,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Dum Dum Metro Station",
+    "latitude": 22.624,
+    "longitude": 88.4,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Noapara Metro Station",
+    "latitude": 22.637,
+    "longitude": 88.399,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Baranagar Metro Station",
+    "latitude": 22.646,
+    "longitude": 88.389,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  },
+  {
+    "name": "Dakshineswar Metro Station",
+    "latitude": 22.655,
+    "longitude": 88.381,
+    "type": "metro",
+    "zone": null,
+    "bonedi": false
+  }
+]
