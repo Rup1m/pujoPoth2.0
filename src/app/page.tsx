@@ -1,12 +1,30 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * Wrapper that provides the Suspense boundary required by useSearchParams()
+ * during Next.js static page generation / prerendering.
+ */
 export default function LandingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Skeleton className="h-12 w-48 rounded-lg" />
+        </div>
+      }
+    >
+      <LandingPageContent />
+    </Suspense>
+  );
+}
+
+function LandingPageContent() {
   const { user, loading, signIn, initializeOneTap } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
