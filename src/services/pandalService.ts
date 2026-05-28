@@ -58,7 +58,18 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
         return [...pandalList, ...metroList];
 
     } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
         console.error("Error fetching from Firestore:", error);
+        
+        // During build time, Firebase credentials may be unavailable.
+        // Throw with a descriptive error that won't break the build with dynamic=force-dynamic.
+        if (errorMsg.includes('undefined') || errorMsg.includes('credential')) {
+            throw new Error(
+              `Firebase not initialized: ensure NEXT_PUBLIC_FIREBASE_* env vars are set in Vercel. ` +
+              `During build, pages with dynamic=force-dynamic will skip prerendering and fetch on-demand instead.`
+            );
+        }
+        
         throw new Error("Could not load pandal data from the database.");
     }
 });
