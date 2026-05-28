@@ -44,16 +44,24 @@ const getDirectionsFlow = ai.defineFlow(
 
         const fetchDirectionsForMode = async (mode: 'walking' | 'driving' | 'transit') => {
              const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${input.origin.lat},${input.origin.lng}&destination=${input.destination.lat},${input.destination.lng}&mode=${mode}&key=${apiKey}`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
-                const response = await fetch(url);
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 if (data.status === 'OK' && data.routes?.[0]?.legs?.[0]?.duration?.text) {
                     return data.routes[0].legs[0].duration.text;
                 }
                 return null;
-            } catch (error) {
-                 console.error(`An unexpected error occurred while fetching ${mode} directions:`, error);
+            } catch (error: unknown) {
+                clearTimeout(timeoutId);
+                if (error instanceof Error && error.name === 'AbortError') {
+                    console.warn('[getDirections] timeout for mode:', mode);
+                } else {
+                    console.error('[getDirections] fetch error for mode:', mode, error);
+                }
                 return null;
             }
         }

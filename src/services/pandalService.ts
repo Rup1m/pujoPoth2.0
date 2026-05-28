@@ -20,14 +20,10 @@ import { cache } from 'react';
 export const getPandals = cache(async (): Promise<Pandal[]> => {
     try {
         console.log('Fetching fresh pandal data from Firestore...');
-        const pandalsCollection = collection(db, 'pandals');
-        const metrosCollection = collection(db, 'Metro');
 
-        // Fetch both collections in parallel for efficiency
-        const [pandalSnapshot, metroSnapshot] = await Promise.all([
-            getDocs(pandalsCollection),
-            getDocs(metrosCollection)
-        ]);
+        // Pandals — critical data, failure propagates up
+        const pandalsCollection = collection(db, 'pandals');
+        const pandalSnapshot = await getDocs(pandalsCollection);
 
         if (pandalSnapshot.empty) {
             console.warn("Firestore 'pandals' collection is empty. You may need to seed it.");
@@ -40,15 +36,23 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
                 ...data,
             } as Pandal;
         });
-        
-        const metroList = metroSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                type: 'metro', // Ensure the type is correctly set for metros
-            } as Pandal;
-        });
+
+        // Metros — optional data, app should still load without it
+        let metroList: Pandal[] = [];
+        try {
+            const metrosCollection = collection(db, 'Metro');
+            const metroSnapshot = await getDocs(metrosCollection);
+            metroList = metroSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    type: 'metro', // Ensure the type is correctly set for metros
+                } as Pandal;
+            });
+        } catch (metroError) {
+            console.warn('[pandalService] Metro collection unavailable:', metroError);
+        }
 
         // Combine pandals and metros into one list for the app to use
         return [...pandalList, ...metroList];

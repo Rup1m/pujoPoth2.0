@@ -1,9 +1,25 @@
 
 import type {Metadata} from 'next';
+import Script from 'next/script';
+import { PT_Sans, Dancing_Script } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/hooks/use-language';
 import GoogleAnalytics from '@/components/google-analytics';
+
+const ptSans = PT_Sans({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-pt-sans',
+  display: 'swap',
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-dancing-script',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Pujoপথ',
@@ -16,12 +32,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-background" suppressHydrationWarning>
+    <html lang="en" className={`bg-background ${ptSans.variable} ${dancingScript.variable}`} suppressHydrationWarning>
       <head>
+        <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#FF9933" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="পুজোপথ" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>

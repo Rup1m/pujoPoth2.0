@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Pandal } from "@/lib/types";
 import { calculateWalkingTime, haversineDistance, formatDistance } from "@/lib/utils";
 import type { DirectionsOutput } from "@/ai/flows/get-directions-flow";
-import { Navigation, Footprints, Car, Loader2, X, TramFront, MapPin, MapPinCheck } from "lucide-react";
+import { Navigation, Footprints, Car, Loader2, X, TramFront, MapPin, MapPinCheck, Share2 } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 interface PandalHubProps {
@@ -55,6 +55,32 @@ export function PandalHub({
   const { language, text } = useLanguage();
   const { toast } = useToast();
 
+  const handleShare = async () => {
+    if (!pandal) return;
+    const url = `${window.location.origin}/app?pandal=${pandal.id}`;
+    const shareData = {
+      title: `PujoPoth — ${pandal.name}`,
+      text: `Visit ${pandal.name} this Durga Puja! Navigate with PujoPoth.`,
+      url: url,
+    };
+
+    if (navigator.share && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (_error) {
+        // User cancelled share — do nothing
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "Link copied!", description: "Share it on WhatsApp or anywhere." });
+      } catch {
+        toast({ title: "Could not copy link", variant: "destructive" });
+      }
+    }
+  };
+
   const handleNavigate = () => {
     if (pandal) {
       trackEvent('directions_requested', { pandal_name: pandal.name, type: pandal.type, zone: pandal.zone ?? 'unknown' });
@@ -70,15 +96,8 @@ export function PandalHub({
   const distanceToPandal = location ? haversineDistance(location, { lat: pandal.latitude, lng: pandal.longitude }) : null;
 
   return (
-    <div className="absolute bottom-4 right-4 z-20 pointer-events-none flex justify-end">
-      <div className="relative w-full max-w-sm pointer-events-auto animate-fade-in-up">
-        {/* Festive Notch Effect */}
-        <div className="absolute top-0 right-0 h-16 w-16 overflow-hidden">
-            <div className="absolute top-0 right-0 h-32 w-32 bg-background transform rotate-45 translate-x-[50%] translate-y-[-50%]"></div>
-        </div>
-        <div className="absolute top-0 right-8 h-8 w-8 overflow-hidden">
-             <div className="h-full w-full bg-primary rounded-bl-full shadow-inner"></div>
-        </div>
+    <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none flex justify-end">
+      <div className="relative w-[calc(100vw-2rem)] sm:max-w-sm max-h-[60vh] overflow-hidden pointer-events-auto animate-fade-in-up">
 
 
         <Card className="w-full bg-background/90 backdrop-blur-sm border-2 border-primary/20 shadow-2xl overflow-hidden">
@@ -105,7 +124,7 @@ export function PandalHub({
                     }
                     onToggleVisited(pandal);
                   }}
-                  className="h-9 w-9 rounded-full"
+                  className="h-11 w-11 rounded-full"
                 >
                   {visitedIds.has(pandal.id) ? (
                     <MapPinCheck className="h-5 w-5 text-emerald-500" aria-label="Mark as not visited" />
@@ -113,7 +132,10 @@ export function PandalHub({
                     <MapPin className="h-5 w-5 text-muted-foreground" aria-label="Mark as visited" />
                   )}
                 </Button>
-                <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 rounded-full">
+                <Button variant="ghost" size="icon" onClick={handleShare} className="h-11 w-11 rounded-full">
+                    <Share2 className="h-5 w-5 text-muted-foreground" aria-label="Share pandal" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={onClose} className="h-11 w-11 rounded-full">
                     <X className="h-5 w-5 text-muted-foreground" />
                 </Button>
               </div>
@@ -145,7 +167,7 @@ export function PandalHub({
                 <Separator className="my-1.5"/>
                 <div className="space-y-1">
                   <h4 className="text-xs font-semibold text-muted-foreground tracking-wide px-1">Nearby Pandals</h4>
-                  <div className="max-h-24 overflow-y-auto space-y-1 pr-1 scrollbar-hide">
+                  <div className="max-h-20 overflow-y-auto space-y-1 pr-1 scrollbar-hide">
                     {suggestions.map((suggestion) => (
                       <div
                         key={suggestion.id}

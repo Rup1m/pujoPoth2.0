@@ -25,6 +25,7 @@ export interface UseLocationReturn {
   location: LatLng | null;
   mapCenter: LatLng;
   status: LocationStatus;
+  locationDenied: boolean;
   getLocation: () => void;
 }
 
@@ -39,6 +40,7 @@ export function useLocation(): UseLocationReturn {
   const [location, setLocation] = useState<LatLng | null>(null);
   const [mapCenter, setMapCenter] = useState<LatLng>(KOLKATA_CENTER);
   const [status, setStatus] = useState<LocationStatus>("idle");
+  const [locationDenied, setLocationDenied] = useState(false);
   const { toast } = useToast();
   const { text } = useLanguage();
 
@@ -52,6 +54,7 @@ export function useLocation(): UseLocationReturn {
         description: text.geolocationNotSupported,
       });
       // Unblock the UI even when geolocation is absent.
+      setLocationDenied(true);
       setStatus("success");
       return;
     }
@@ -64,6 +67,7 @@ export function useLocation(): UseLocationReturn {
         };
         setLocation(newLocation);
         setMapCenter(newLocation);
+        setLocationDenied(false);
         setStatus("success");
       },
       (err) => {
@@ -81,11 +85,14 @@ export function useLocation(): UseLocationReturn {
         });
 
         // Show the map centred on Kolkata even on error.
+        if (err.code === err.PERMISSION_DENIED || err.code === err.POSITION_UNAVAILABLE) {
+          setLocationDenied(true);
+        }
         setStatus("success");
       },
       { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 }
     );
   }, [toast, text]);
 
-  return { location, mapCenter, status, getLocation };
+  return { location, mapCenter, status, locationDenied, getLocation };
 }

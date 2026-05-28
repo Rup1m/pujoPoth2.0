@@ -1,15 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function LandingPage() {
-  const { user, loading, signingIn, signIn } = useAuth();
+  const { user, loading, signIn, initializeOneTap } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  // Stash a pending pandal deep-link ID so it survives the sign-in redirect.
+  useEffect(() => {
+    const pendingPandal = searchParams.get("pandal");
+    if (pendingPandal) {
+      localStorage.setItem("pendingPandalId", pendingPandal);
+    }
+  }, [searchParams]);
 
   // Redirect authenticated users straight to /app.
   // This fires both on initial load (returning user) AND after a fresh sign-in
@@ -18,9 +27,22 @@ export default function LandingPage() {
   // call inside handleExplore, which eliminates the race condition.
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/app");
+      const pendingId = localStorage.getItem("pendingPandalId");
+      localStorage.removeItem("pendingPandalId");
+      if (pendingId) {
+        router.replace(`/app?pandal=${pendingId}`);
+      } else {
+        router.replace("/app");
+      }
     }
   }, [loading, user, router]);
+
+  // ── Initialize Google One-Tap on mount ─────────────────────────────────────
+  useEffect(() => {
+    if (!loading && !user) {
+      initializeOneTap();
+    }
+  }, [loading, user, initializeOneTap]);
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (loading || user) {
@@ -31,10 +53,12 @@ export default function LandingPage() {
     );
   }
 
-  // ── CTA handler ────────────────────────────────────────────────────────────
-  // Does NOT navigate on success — the useEffect above handles that once
-  // onAuthStateChanged fires and sets `user`.
-  const handleExplore = async () => {
+  // ── CTA handler (fallback if One-Tap was dismissed) ────────────────────────
+  const handleSignIn = async () => {
+    // Try re-triggering One-Tap first
+    initializeOneTap();
+
+    // If One-Tap is unavailable (e.g. no client ID), fall back to popup
     const result = await signIn();
 
     // Only toast on actual errors — not on user cancelling the popup
@@ -72,11 +96,10 @@ export default function LandingPage() {
 
         {/* CTA */}
         <button
-          onClick={handleExplore}
-          disabled={signingIn}
-          className="block w-full max-w-xs rounded-lg bg-primary text-primary-foreground text-center font-bold text-lg py-4 px-6 active:scale-95 transition-transform disabled:opacity-60 disabled:pointer-events-none"
+          onClick={handleSignIn}
+          className="block w-full max-w-xs rounded-lg bg-primary text-primary-foreground text-center font-bold text-lg py-4 px-6 active:scale-95 transition-transform"
         >
-          {signingIn ? "Signing in…" : "Explore Pandals →"}
+          Sign in with Google
         </button>
       </section>
 

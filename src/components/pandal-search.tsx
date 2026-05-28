@@ -40,6 +40,14 @@ export function PandalSearch({ pandals }: { pandals: Pandal[] }) {
     setIsLoading(false);
   }, [pandals]);
 
+  // Instant clear: no debounce delay when query is too short
+  useEffect(() => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [query]);
+
   useEffect(() => {
     fetchSuggestions(debouncedQuery);
   }, [debouncedQuery, fetchSuggestions]);

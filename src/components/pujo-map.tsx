@@ -21,7 +21,7 @@ import {
   APIProvider,
   useMap,
 } from "@vis.gl/react-google-maps";
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, useRef, memo } from "react";
 import dynamic from "next/dynamic";
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +31,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { useLocation } from "@/hooks/use-location";
 import { useDirections } from "@/hooks/use-directions";
 import { useVisitedPandals } from "@/hooks/use-visited-pandals";
+import { useAuth } from "@/hooks/use-auth";
 import type { Pandal } from "@/lib/types";
 import { getFilteredPandals } from "@/services/pandalService";
 import type { Filters } from "@/components/filter-panel";
@@ -92,9 +93,11 @@ const CardioLoadingAnimation = () => (
 
 interface MapCoreProps {
   location: { lat: number; lng: number } | null;
+  locationDenied: boolean;
   initialPandals: Pandal[];
   initialCenter: { lat: number; lng: number };
   userId?: string;
+  initialSelectedPandalId?: string;
 }
 
 /**
@@ -102,12 +105,13 @@ interface MapCoreProps {
  * It orchestrates pandal selection, suggestion calculation, filtering,
  * and imperative map navigation — delegating all rendering to focused children.
  */
-function MapCore({ location, initialPandals, initialCenter, userId }: MapCoreProps) {
+function MapCore({ location, locationDenied, initialPandals, initialCenter, userId, initialSelectedPandalId }: MapCoreProps) {
   const mapInstance = useMap();
   const { text } = useLanguage();
   const { toast } = useToast();
   const { directions, isFetchingDirections, fetchDirections, clearDirections } = useDirections();
   const { visitedIds, toggleVisited } = useVisitedPandals(userId ?? null);
+  const { user: firebaseUser } = useAuth();
 
   const [displayedPandals, setDisplayedPandals] =
     useState<Pandal[]>(initialPandals);
@@ -116,6 +120,7 @@ function MapCore({ location, initialPandals, initialCenter, userId }: MapCorePro
     (Pandal & { distance: number })[]
   >([]);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const directionsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Suggestion calculation ────────────────────────────────────────────────
 
@@ -160,12 +165,18 @@ function MapCore({ location, initialPandals, initialCenter, userId }: MapCorePro
         if ((mapInstance.getZoom() ?? 0) < 15) mapInstance.setZoom(15);
       }
 
-      // Fetch directions only when we have the user's location
+      // Fetch directions only when we have the user's location (debounced)
       if (location) {
-        fetchDirections(location, {
-          lat: pandal.latitude,
-          lng: pandal.longitude,
-        });
+        // Clear any pending debounced fetch from a previous rapid selection
+        if (directionsDebounceRef.current) {
+          clearTimeout(directionsDebounceRef.current);
+        }
+        directionsDebounceRef.current = setTimeout(() => {
+          fetchDirections(location, {
+            lat: pandal.latitude,
+            lng: pandal.longitude,
+          });
+        }, 500);
       }
     },
     [
@@ -179,10 +190,34 @@ function MapCore({ location, initialPandals, initialCenter, userId }: MapCorePro
   );
 
   const handlePandalDeselect = useCallback(() => {
+    if (directionsDebounceRef.current) {
+      clearTimeout(directionsDebounceRef.current);
+    }
     setSelectedPandal(null);
     setSuggestedPandals([]);
     clearDirections();
   }, [clearDirections]);
+
+  // ── Deep-link auto-select ─────────────────────────────────────────────────
+
+  const deepLinkHandledRef = useRef(false);
+  useEffect(() => {
+    if (
+      initialSelectedPandalId &&
+      initialPandals.length > 0 &&
+      !deepLinkHandledRef.current
+    ) {
+      const target = initialPandals.find((p) => p.id === initialSelectedPandalId);
+      if (target) {
+        deepLinkHandledRef.current = true;
+        // Delay to ensure the map tiles and markers are fully initialised
+        const timer = setTimeout(() => {
+          handlePandalSelect(target);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [initialSelectedPandalId, initialPandals, handlePandalSelect]);
 
   // ── Recenter handler ──────────────────────────────────────────────────────
 
@@ -260,7 +295,19 @@ function MapCore({ location, initialPandals, initialCenter, userId }: MapCorePro
         onFilterChange={handleFilterChange}
         isAboutOpen={isAboutOpen}
         onAboutOpenChange={setIsAboutOpen}
+        user={firebaseUser}
+        visitedIds={visitedIds}
+        allPandals={initialPandals}
       />
+      {/* Location denied banner */}
+      {locationDenied && (
+        <div className="absolute top-[72px] left-4 right-4 z-10 flex items-center gap-2 bg-background/90 backdrop-blur-sm border border-amber-400/50 rounded-xl px-4 py-2">
+          <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+          <p className="text-xs text-foreground">
+            Location unavailable — showing central Kolkata. Directions disabled.
+          </p>
+        </div>
+      )}
     </>
   );
 }
@@ -283,22 +330,30 @@ const DynamicMapCore = dynamic(() => Promise.resolve(memo(MapCore)), {
 export default function PujoMap({
   initialPandals,
   userId,
+  initialSelectedPandalId,
 }: {
   initialPandals: Pandal[];
   userId?: string;
+  initialSelectedPandalId?: string;
 }) {
   const [isClient, setIsClient] = useState(false);
   const [animComplete, setAnimComplete] = useState(false);
   const [langSelected, setLangSelected] = useState(false);
   const { text } = useLanguage();
-  const { location, mapCenter, status, getLocation } = useLocation();
+  const { location, mapCenter, status, locationDenied, getLocation } = useLocation();
 
   // ── Client-side initialisation ────────────────────────────────────────────
 
   useEffect(() => {
-    setIsClient(true);
     const storedLang = localStorage.getItem("lang");
-    if (storedLang) setLangSelected(true);
+    if (storedLang) {
+      // Returning user: bypass splash + language screen entirely
+      setIsClient(true);
+      setAnimComplete(true);
+      setLangSelected(true);
+    } else {
+      setIsClient(true);
+    }
   }, []);
 
   /** Called by SplashScreen once the minimum animation duration elapses. */
@@ -365,9 +420,11 @@ export default function PujoMap({
       >
         <DynamicMapCore
           location={location}
+          locationDenied={locationDenied}
           initialPandals={initialPandals}
           initialCenter={mapCenter}
           userId={userId}
+          initialSelectedPandalId={initialSelectedPandalId}
         />
       </APIProvider>
     </div>

@@ -12,15 +12,19 @@ import type { Pandal } from "@/lib/types";
  * Shows SplashScreen while auth state resolves, redirects to / if unauthenticated,
  * and renders PujoMap with the userId prop once authenticated.
  */
-export function AuthGatedApp({ initialPandals }: { initialPandals: Pandal[] }) {
+export function AuthGatedApp({ initialPandals, initialSelectedPandalId }: { initialPandals: Pandal[]; initialSelectedPandalId?: string }) {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
+      // Preserve the deep-link pandal ID through the sign-in redirect
+      if (initialSelectedPandalId) {
+        localStorage.setItem("pendingPandalId", initialSelectedPandalId);
+      }
       router.replace("/");
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, initialSelectedPandalId]);
 
   if (loading) {
     return <SplashScreen />;
@@ -30,5 +34,5 @@ export function AuthGatedApp({ initialPandals }: { initialPandals: Pandal[] }) {
     return <SplashScreen />;
   }
 
-  return <PujoMap initialPandals={initialPandals} userId={user.uid} />;
+  return <PujoMap initialPandals={initialPandals} userId={user.uid} initialSelectedPandalId={initialSelectedPandalId} />;
 }

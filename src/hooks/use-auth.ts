@@ -5,10 +5,37 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithCredential,
   signOut as firebaseSignOut,
   type User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-config";
+
+/** Minimal type declarations for Google Identity Services (GSI). */
+interface GoogleCredentialResponse {
+  credential: string;
+  select_by: string;
+}
+
+interface GoogleAccountsId {
+  initialize(config: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+    auto_select?: boolean;
+    cancel_on_tap_outside?: boolean;
+  }): void;
+  prompt(): void;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: GoogleAccountsId;
+      };
+    };
+  }
+}
 
 const LS_KEY = "pujopath_uid";
 
@@ -86,5 +113,29 @@ export function useAuth() {
     }
   }, []);
 
-  return { user, loading, signingIn, signIn, signOut };
+  const initializeOneTap = useCallback(() => {
+    if (typeof window === 'undefined' || !window.google) return;
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId) return;
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async (response: GoogleCredentialResponse) => {
+        try {
+          const credential = GoogleAuthProvider.credential(response.credential);
+          await signInWithCredential(auth, credential);
+          // onAuthStateChanged handles state update + navigation
+        } catch (err) {
+          console.error('[useAuth] One-Tap sign-in failed:', err);
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: false,
+    });
+
+    window.google.accounts.id.prompt();
+  }, []);
+
+  return { user, loading, signingIn, signIn, signOut, initializeOneTap };
 }
