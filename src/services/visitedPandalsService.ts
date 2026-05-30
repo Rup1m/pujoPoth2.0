@@ -24,7 +24,7 @@ export interface VisitedPandalDoc {
  * Document ID = pandal.id so marks are idempotent.
  */
 export async function markVisited(userId: string, pandal: Pandal): Promise<void> {
-  const ref = doc(db, "users", userId, "visitedPandals", pandal.id);
+  const ref = doc(db(), "users", userId, "visitedPandals", pandal.id);
   await setDoc(
     ref,
     {
@@ -45,7 +45,7 @@ export async function markVisited(userId: string, pandal: Pandal): Promise<void>
  * Removes a pandal from the user's visitedPandals collection.
  */
 export async function unmarkVisited(userId: string, pandalId: string): Promise<void> {
-  const ref = doc(db, "users", userId, "visitedPandals", pandalId);
+  const ref = doc(db(), "users", userId, "visitedPandals", pandalId);
   await deleteDoc(ref);
 }
 
@@ -53,7 +53,7 @@ export async function unmarkVisited(userId: string, pandalId: string): Promise<v
  * Returns the IDs of all pandals visited by this user.
  */
 export async function getVisitedPandals(userId: string): Promise<string[]> {
-  const colRef = collection(db, "users", userId, "visitedPandals");
+  const colRef = collection(db(), "users", userId, "visitedPandals");
   const snapshot = await getDocs(colRef);
   return snapshot.docs.map((d) => d.id);
 }
@@ -63,7 +63,7 @@ export async function getVisitedPandals(userId: string): Promise<string[]> {
  * sorted most-recently-visited first.
  */
 export async function getVisitedPandalDetails(userId: string): Promise<VisitedPandalDoc[]> {
-  const colRef = collection(db, "users", userId, "visitedPandals");
+  const colRef = collection(db(), "users", userId, "visitedPandals");
   const snapshot = await getDocs(colRef);
   return snapshot.docs
     .map((d) => {

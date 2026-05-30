@@ -5,6 +5,8 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithCredential,
   signOut as firebaseSignOut,
   type User,
@@ -46,13 +48,39 @@ const SILENT_ERROR_CODES = new Set([
   "auth/user-cancelled",
 ]);
 
+/**
+ * Detects whether the current browser context is likely to block popups:
+ *  - Mobile devices (phones/tablets)
+ *  - In-app browsers (Instagram, Facebook, WhatsApp, etc.)
+ *  - PWA / standalone display mode
+ */
+function shouldUseRedirect(): boolean {
+  if (typeof window === "undefined") return false;
+
+  const ua = navigator.userAgent || "";
+
+  // Mobile device check
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(ua);
+
+  // In-app browser detection (Instagram, Facebook, WhatsApp, Line, etc.)
+  const isInAppBrowser = /FBAN|FBAV|Instagram|Line|WhatsApp|Snapchat|Twitter|Weibo/i.test(ua);
+
+  // PWA / standalone mode
+  const isStandalone =
+    window.matchMedia?.("(display-mode: standalone)")?.matches ||
+    (navigator as { standalone?: boolean }).standalone === true;
+
+  return isMobile || isInAppBrowser || isStandalone;
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
 
+  // ── Listen to auth state changes ─────────────────────────────────────────
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth(), (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
 
@@ -74,6 +102,23 @@ export function useAuth() {
     return unsubscribe;
   }, []);
 
+  // ── Handle redirect result on mount (for mobile sign-in flow) ──────────
+  useEffect(() => {
+    getRedirectResult(auth())
+      .then((result) => {
+        if (result?.user) {
+          // onAuthStateChanged will pick this up — no extra action needed
+          console.log("[useAuth] Redirect sign-in succeeded");
+        }
+      })
+      .catch((err) => {
+        const code = (err as { code?: string })?.code ?? "";
+        if (!SILENT_ERROR_CODES.has(code)) {
+          console.error("[useAuth] Redirect sign-in failed:", code, err);
+        }
+      });
+  }, []);
+
   const signIn = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
     // Prevent concurrent sign-in attempts (double-click protection)
     if (signingIn) return { success: false };
@@ -81,9 +126,29 @@ export function useAuth() {
     setSigningIn(true);
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      // onAuthStateChanged will handle setting the user — no navigation here
-      return { success: true };
+
+      if (shouldUseRedirect()) {
+        // Mobile / in-app browser: redirect-based flow (won't return from here)
+        await signInWithRedirect(auth(), provider);
+        // Page will navigate away — return optimistically
+        return { success: true };
+      }
+
+      // Desktop: popup-based flow
+      try {
+        await signInWithPopup(auth(), provider);
+        return { success: true };
+      } catch (popupErr: unknown) {
+        const popupCode = (popupErr as { code?: string })?.code ?? "";
+
+        // If popup was blocked, fall back to redirect
+        if (popupCode === "auth/popup-blocked") {
+          await signInWithRedirect(auth(), provider);
+          return { success: true };
+        }
+
+        throw popupErr; // re-throw for outer catch
+      }
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code ?? "";
       const message = (err as { message?: string })?.message ?? "Unknown error";
@@ -102,7 +167,7 @@ export function useAuth() {
 
   const signOut = useCallback(async () => {
     try {
-      await firebaseSignOut(auth);
+      await firebaseSignOut(auth());
     } catch (err) {
       console.error("[useAuth] signOut failed:", err);
     }
@@ -124,7 +189,7 @@ export function useAuth() {
       callback: async (response: GoogleCredentialResponse) => {
         try {
           const credential = GoogleAuthProvider.credential(response.credential);
-          await signInWithCredential(auth, credential);
+          await signInWithCredential(auth(), credential);
           // onAuthStateChanged handles state update + navigation
         } catch (err) {
           console.error('[useAuth] One-Tap sign-in failed:', err);
@@ -139,3 +204,4 @@ export function useAuth() {
 
   return { user, loading, signingIn, signIn, signOut, initializeOneTap };
 }
+

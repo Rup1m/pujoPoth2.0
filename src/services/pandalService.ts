@@ -22,7 +22,7 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
         console.log('Fetching fresh pandal data from Firestore...');
 
         // Pandals — critical data, failure propagates up
-        const pandalsCollection = collection(db, 'pandals');
+        const pandalsCollection = collection(db(), 'pandals');
         const pandalSnapshot = await getDocs(pandalsCollection);
 
         if (pandalSnapshot.empty) {
@@ -40,7 +40,7 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
         // Metros — optional data, app should still load without it
         let metroList: Pandal[] = [];
         try {
-            const metrosCollection = collection(db, 'Metro');
+            const metrosCollection = collection(db(), 'Metro');
             const metroSnapshot = await getDocs(metrosCollection);
             metroList = metroSnapshot.docs.map(doc => {
                 const data = doc.data();

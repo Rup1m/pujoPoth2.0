@@ -17,12 +17,14 @@ const firebaseConfig = {
  * NEXT_PUBLIC_FIREBASE_* env vars are absent, which causes
  * `auth/invalid-api-key` if initialization happens at import time.
  *
- * By deferring to getter functions the SDK is only touched when
- * application code actually calls `getDb()` / `getAuth()` — i.e. at
- * request time in production, never during the static-analysis build phase.
+ * Consumers call `getDb()` and `getFirebaseAuth()` to obtain the real
+ * Firebase instances — these are only constructed on first access at
+ * request time, never during the static-analysis build phase.
  */
 
 let _app: FirebaseApp | null = null;
+let _db: Firestore | null = null;
+let _auth: Auth | null = null;
 
 function getFirebaseApp(): FirebaseApp {
     if (!_app) {
@@ -33,28 +35,20 @@ function getFirebaseApp(): FirebaseApp {
 
 /** Firestore instance — safe to call at request time. */
 function getDb(): Firestore {
-    return getFirestore(getFirebaseApp());
+    if (!_db) {
+        _db = getFirestore(getFirebaseApp());
+    }
+    return _db;
 }
 
 /** Auth instance — safe to call at request time. */
 function getFirebaseAuth(): Auth {
-    return getAuth(getFirebaseApp());
+    if (!_auth) {
+        _auth = getAuth(getFirebaseApp());
+    }
+    return _auth;
 }
 
-// Re-export under the same names so existing imports (`db`, `auth`) keep working.
-// These are now getters on a module-level object, evaluated lazily on first access.
-const db: Firestore = new Proxy({} as Firestore, {
-    get(_target, prop, receiver) {
-        return Reflect.get(getDb(), prop, receiver);
-    },
-});
+export { getDb as db, getFirebaseAuth as auth, getFirebaseApp as app };
 
-const auth: Auth = new Proxy({} as Auth, {
-    get(_target, prop, receiver) {
-        return Reflect.get(getFirebaseAuth(), prop, receiver);
-    },
-});
-
-export { db, auth };
-export { getFirebaseApp as app };
 
