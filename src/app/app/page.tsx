@@ -11,10 +11,6 @@ import type { Pandal } from '@/lib/types';
  */
 export const dynamic = 'force-dynamic';
 
-/** Revalidate every 600 seconds (10 minutes) via ISR.
- *  Pandal data is static during Puja — this is more than sufficient. */
-export const revalidate = 600;
-
 export default async function AppPage({
   searchParams,
 }: {
@@ -27,11 +23,8 @@ export default async function AppPage({
 
   try {
     pandals = await getPandals();
-  } catch (error) {
-    // If Firestore fetch fails, app will still render with empty state
-    // and client-side components can fetch data independently
-    console.error('[AppPage] Failed to fetch pandals:', error);
-    fetchError = error instanceof Error ? error.message : 'Failed to load pandals';
+  } catch {
+    fetchError = 'Failed to load pandals';
   }
 
   const { pandal: initialSelectedPandalId } = await searchParams;
