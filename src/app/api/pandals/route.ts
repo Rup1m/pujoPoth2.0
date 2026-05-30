@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getPandals } from '@/services/pandalService';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * API Route to fetch pandals.
  * Used as a fallback when server-side rendering fails during build or
