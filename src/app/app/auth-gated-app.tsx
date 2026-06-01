@@ -30,10 +30,22 @@ export function AuthGatedApp({
   const [hasError, setHasError] = useState(!!initialFetchError);
   const [hydrationDelay, setHydrationDelay] = useState(true);
 
-  // Brief delay to let Firebase resolve redirect-result auth before making
-  // any redirect decisions — prevents false "unauthenticated" flashes.
+  // ── Hydration delay with extended timeout for redirect processing ────────
+  //
+  // After user completes OAuth redirect and returns to /app, Firebase's
+  // onAuthStateChanged needs time to resolve the persisted auth state.
+  // The delay MUST be long enough for:
+  //   1. getRedirectResult() to process (if this is the redirect landing)
+  //   2. Persistence (IndexedDB/localStorage) to be read
+  //   3. onAuthStateChanged listener to fire with the final auth state
+  //
+  // With 500ms, slow connections/devices could timeout prematurely, causing
+  // the component to redirect to / before the user state resolves, trapping
+  // users on the landing page.
+  //
+  // 1500ms provides a generous buffer for all these operations on any device.
   useEffect(() => {
-    const timer = setTimeout(() => setHydrationDelay(false), 500);
+    const timer = setTimeout(() => setHydrationDelay(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -59,14 +71,29 @@ export function AuthGatedApp({
     }
   }, [initialFetchError, pandals.length]);
 
+  // ── Auth-gated redirect: send unauthenticated users back to landing page ──
+  //
+  // CRITICAL: Only redirect after both:
+  //   1. Loading state is false (auth state has been resolved)
+  //   2. Hydration delay has passed (redirect processing is complete)
+  //
+  // If we redirect before these complete, users get trapped on the landing
+  // page even though they successfully authenticated.
   useEffect(() => {
-    if (loading || hydrationDelay) return;
+    if (loading || hydrationDelay) {
+      console.log('[AuthGatedApp] Waiting for hydration:', { loading, hydrationDelay });
+      return;
+    }
+
     if (!user) {
+      console.log('[AuthGatedApp] User is not authenticated, redirecting to landing page');
       // Preserve the deep-link pandal ID through the sign-in redirect
       if (initialSelectedPandalId) {
         localStorage.setItem("pendingPandalId", initialSelectedPandalId);
       }
       router.replace("/");
+    } else {
+      console.log('[AuthGatedApp] User authenticated, rendering map:', user.email);
     }
   }, [loading, user, hydrationDelay, router, initialSelectedPandalId]);
 

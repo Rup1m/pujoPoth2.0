@@ -51,9 +51,11 @@ function LandingPageContent() {
   // call inside handleExplore, which eliminates the race condition.
   useEffect(() => {
     if (!loading && user) {
+      console.log('[LandingPage] User authenticated, redirecting to /app:', user.email);
       const pendingId = localStorage.getItem("pendingPandalId");
       localStorage.removeItem("pendingPandalId");
       if (pendingId) {
+        console.log('[LandingPage] Redirecting with pandal ID:', pendingId);
         router.replace(`/app?pandal=${pendingId}`);
       } else {
         router.replace("/app");

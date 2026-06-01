@@ -104,10 +104,18 @@ export function useAuth() {
       //    redirect, so it does NOT add latency for non-redirect visitors.
       //    For redirect returns, this is the step that exchanges the Google
       //    auth code for Firebase credentials and writes the session.
+      //    
+      //    IMPORTANT: getRedirectResult can only be called once per redirect.
+      //    If called multiple times (in different useAuth instances), only the
+      //    first call processes the redirect; subsequent calls return null.
+      //    This is why we rely on persistence + onAuthStateChanged to handle
+      //    auth state in second+ useAuth instances (e.g., after navigation to /app).
+      let redirectProcessed = false;
       try {
         const result = await getRedirectResult(authInstance);
         if (result?.user) {
-          console.log("[useAuth] Redirect sign-in succeeded");
+          redirectProcessed = true;
+          console.log("[useAuth] Redirect sign-in succeeded:", result.user.email);
         }
       } catch (err) {
         const code = (err as { code?: string })?.code ?? "";
@@ -118,15 +126,31 @@ export function useAuth() {
 
       if (cancelled) return;
 
+      // 2.5. After processing redirect result, wait a brief moment to ensure
+      //      persistence has been written to storage. This prevents a race where
+      //      onAuthStateChanged fires before the session cookie/token is ready.
+      if (redirectProcessed) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      if (cancelled) return;
+
       // 3. NOW attach the auth state listener.
       //    At this point, if a redirect was processed above, the auth state
       //    already includes the authenticated user. The first callback will
       //    fire with the correct user — never with a premature `null`.
+      //    If this is a second+ useAuth instance (after client navigation),
+      //    the listener will fire with the persisted user (if any).
       unsubRef.current = onAuthStateChanged(authInstance, (firebaseUser) => {
         if (cancelled) return;
         setUser(firebaseUser);
         setLoading(false);
         cacheUid(firebaseUser);
+        if (firebaseUser) {
+          console.log("[useAuth] Auth state resolved:", firebaseUser.email);
+        } else {
+          console.log("[useAuth] Auth state resolved: unauthenticated");
+        }
       });
     };
 
