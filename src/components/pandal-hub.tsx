@@ -104,16 +104,16 @@ export function PandalHub({
           <CardContent className="p-2.5 pb-1">
             {/* Main Pandal Info */}
             <div className="relative">
-               <div className="space-y-1 pr-10">
-                <h3 className="text-base font-bold text-foreground tracking-tight">{displayName(pandal)}</h3>
-                <div className="flex items-center space-x-2 text-xs text-primary font-semibold">
+               <div className="space-y-1 pr-28">
+                <h3 className="text-base font-bold text-foreground tracking-tight break-words line-clamp-2">{displayName(pandal)}</h3>
+                <div className="flex items-center space-x-2 text-xs text-primary font-semibold flex-wrap">
                     {pandal.bonedi && <p>Bonedi Bari Pujo</p>}
                     {pandal.bonedi && distanceToPandal !== null && <span className="text-muted-foreground/50">|</span>}
                     {distanceToPandal !== null && <p className="text-muted-foreground">{formatDistance(distanceToPandal)}</p>}
                 </div>
               </div>
 
-              <div className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5">
+              <div className="absolute top-1 right-1 flex items-center gap-0.5">
                 <Button
                   variant="ghost"
                   size="icon"
