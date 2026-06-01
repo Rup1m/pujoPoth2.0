@@ -38,14 +38,16 @@ export function AuthGatedApp({
   //   1. getRedirectResult() to process (if this is the redirect landing)
   //   2. Persistence (IndexedDB/localStorage) to be read
   //   3. onAuthStateChanged listener to fire with the final auth state
+  //   4. User profile initialization (ensureUserExists) to complete
   //
   // With 500ms, slow connections/devices could timeout prematurely, causing
   // the component to redirect to / before the user state resolves, trapping
   // users on the landing page.
   //
-  // 1500ms provides a generous buffer for all these operations on any device.
+  // 2000ms provides a generous buffer for all these operations on any device,
+  // including Firestore user profile creation.
   useEffect(() => {
-    const timer = setTimeout(() => setHydrationDelay(false), 1500);
+    const timer = setTimeout(() => setHydrationDelay(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 

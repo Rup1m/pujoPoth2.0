@@ -14,6 +14,7 @@ import {
   type User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-config";
+import { ensureUserExists } from "@/services/userService";
 
 const LS_KEY = "pujopath_uid";
 
@@ -143,6 +144,54 @@ export function useAuth() {
       //    the listener will fire with the persisted user (if any).
       unsubRef.current = onAuthStateChanged(authInstance, (firebaseUser) => {
         if (cancelled) return;
+
+        if (firebaseUser) {
+          // NEW: Ensure user document exists in Firestore on first sign-in
+          // This is non-blocking — we set the user state immediately and
+          // ensure the profile in parallel. If ensureUserExists fails,
+          // we log the error but don't block the user from using the app.
+          // 
+          // RETRY LOGIC: If user initialization fails (network, permission, etc),
+          // attempt retry after 2 seconds. This provides automatic recovery for
+          // transient failures without requiring user intervention.
+          let retryCount = 0;
+          const maxRetries = 3;
+          const retryInterval = 2000; // 2 seconds between retries
+
+          const tryEnsureUser = async () => {
+            try {
+              await ensureUserExists(firebaseUser);
+              console.log(
+                "[useAuth] User profile initialized successfully:",
+                firebaseUser.email
+              );
+            } catch (err) {
+              retryCount++;
+              if (retryCount < maxRetries) {
+                console.warn(
+                  `[useAuth] User profile initialization failed (attempt ${retryCount}/${maxRetries}), retrying in ${retryInterval}ms:`,
+                  err
+                );
+                // Schedule retry
+                const retryTimer = setTimeout(tryEnsureUser, retryInterval);
+                // Clean up retry timer on unmount
+                const originalUnsub = unsubRef.current;
+                unsubRef.current = () => {
+                  clearTimeout(retryTimer);
+                  originalUnsub?.();
+                };
+              } else {
+                console.error(
+                  "[useAuth] Failed to initialize user profile after 3 attempts:",
+                  err
+                );
+              }
+            }
+          };
+
+          tryEnsureUser();
+        }
+
         setUser(firebaseUser);
         setLoading(false);
         cacheUid(firebaseUser);
