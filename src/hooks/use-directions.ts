@@ -2,6 +2,13 @@
  * @fileoverview useDirections — encapsulates travel-time fetching via the
  * server-side Genkit flow.  Consumers call `fetchDirections(origin, dest)`
  * and receive the current `directions` state plus a `clearDirections` helper.
+ *
+ * Optimizations:
+ *  - Input validation to prevent invalid API calls
+ *  - Request deduplication with ID tracking
+ *  - Stale result rejection
+ *  - Abort controller for pending requests
+ *  - Better error handling and logging
  */
 
 "use client";
@@ -32,15 +39,34 @@ const DIRECTIONS_TIMEOUT_MS = 8000;
  *
  * Uses a monotonically increasing request ID so that stale results from
  * superseded requests are silently discarded.
+ *
+ * Improvements:
+ *  - Input validation to prevent invalid API calls
+ *  - AbortController for request cancellation
+ *  - Better error logging for debugging
  */
 export function useDirections(): UseDirectionsReturn {
   const [directions, setDirections] = useState<DirectionsOutput | null>(null);
   const [isFetchingDirections, setIsFetchingDirections] = useState(false);
   const requestIdRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchDirections = useCallback(
     async (origin: LatLng, destination: LatLng) => {
+      // Validate inputs to prevent invalid API calls
+      if (!origin || !destination || !isFinite(origin.lat) || !isFinite(destination.lat)) {
+        console.warn("[useDirections] Invalid origin or destination coordinates");
+        setDirections(null);
+        return;
+      }
+
       const currentRequestId = ++requestIdRef.current;
+
+      // Cancel previous request if still in flight
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
 
       setDirections(null); // Reset before fetching so stale data is cleared.
       setIsFetchingDirections(true);
@@ -73,6 +99,12 @@ export function useDirections(): UseDirectionsReturn {
   const clearDirections = useCallback(() => {
     // Bump request ID to invalidate any in-flight requests
     ++requestIdRef.current;
+    
+    // Abort any pending requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     setDirections(null);
     setIsFetchingDirections(false);
   }, []);

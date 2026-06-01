@@ -9,6 +9,12 @@
  *    and forward it to the parent via `onPandalSelect`
  *
  * All state management and business logic live in the parent (pujo-map.tsx).
+ *
+ * Optimizations:
+ *  - Memoized to prevent re-renders on parent prop changes
+ *  - Marker filtering prevents rendering invalid coordinates
+ *  - Error-safe event listener with try-catch
+ *  - Static map styles to prevent Map remounts
  */
 
 "use client";
@@ -48,6 +54,8 @@ export interface MapContainerProps {
  * Pure-rendering component — receives all data through props and fires
  * callback events upward. Contains no internal async logic or side-effects
  * beyond the DOM event listener.
+ *
+ * Error handling: wrapped in try-catch to prevent crashes from malformed events.
  */
 export const MapContainer = memo(function MapContainer({
   location,
@@ -58,12 +66,21 @@ export const MapContainer = memo(function MapContainer({
   onPandalSelect,
   onPandalDeselect,
 }: MapContainerProps) {
-  /** Bridge the custom DOM event emitted by PandalSearch up to the parent. */
+  /** Bridge the custom DOM event emitted by PandalSearch up to the parent.
+   *  Wrapped in try-catch to gracefully handle malformed events. */
   const handlePandalSelectEvent = useCallback(
     (event: Event) => {
-      const pandal = (event as CustomEvent<Pandal>).detail;
-      if (pandal) onPandalSelect(pandal);
-      else onPandalDeselect();
+      try {
+        const pandal = (event as CustomEvent<Pandal>).detail;
+        if (pandal && pandal.id) {
+          onPandalSelect(pandal);
+        } else {
+          onPandalDeselect();
+        }
+      } catch (error) {
+        console.error("[MapContainer] Error handling pandalSelected event:", error);
+        // Fail gracefully without crashing
+      }
     },
     [onPandalSelect, onPandalDeselect]
   );
@@ -103,7 +120,10 @@ export const MapContainer = memo(function MapContainer({
       {pandals
         .filter(
           (p) =>
-            typeof p.latitude === "number" && typeof p.longitude === "number"
+            typeof p.latitude === "number" &&
+            typeof p.longitude === "number" &&
+            isFinite(p.latitude) &&
+            isFinite(p.longitude)
         )
         .map((pandal) => (
           <AdvancedMarker
