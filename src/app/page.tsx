@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,7 +25,13 @@ export default function LandingPage() {
 }
 
 function LandingPageContent() {
-  const { user, loading, signIn, initializeOneTap } = useAuth();
+  const { user, loading, signingIn, signIn } = useAuth();
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -55,12 +61,6 @@ function LandingPageContent() {
     }
   }, [loading, user, router]);
 
-  // ── Initialize Google One-Tap on mount ─────────────────────────────────────
-  useEffect(() => {
-    if (!loading && !user) {
-      initializeOneTap();
-    }
-  }, [loading, user, initializeOneTap]);
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (loading || user) {
@@ -71,23 +71,29 @@ function LandingPageContent() {
     );
   }
 
-  // ── CTA handler (fallback if One-Tap was dismissed) ────────────────────────
+  // ── CTA handler ─────────────────────────────────────────────────────────────
+  const busy = isSigningIn || signingIn;
+
   const handleSignIn = async () => {
-    // Try re-triggering One-Tap first
-    initializeOneTap();
+    if (busy) return;
+    setIsSigningIn(true);
 
-    // If One-Tap is unavailable (e.g. no client ID), fall back to popup
-    const result = await signIn();
+    try {
+      const result = await signIn();
 
-    // Only toast on actual errors — not on user cancelling the popup
-    if (result.error) {
-      toast({
-        title: "Sign in failed",
-        description: result.error.startsWith("auth/")
-          ? "Please check your internet connection and try again."
-          : "Please try again.",
-        variant: "destructive",
-      });
+      // On mobile redirect, signIn() navigates away — this line won't run.
+      // Only toast on actual errors — not on user cancelling the popup.
+      if (result.error) {
+        toast({
+          title: "Sign in failed",
+          description: result.error.startsWith("auth/")
+            ? "Please check your internet connection and try again."
+            : "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      if (mountedRef.current) setIsSigningIn(false);
     }
   };
 
@@ -115,9 +121,20 @@ function LandingPageContent() {
         {/* CTA */}
         <button
           onClick={handleSignIn}
-          className="block w-full max-w-xs rounded-lg bg-primary text-primary-foreground text-center font-bold text-lg py-4 px-6 active:scale-95 transition-transform"
+          disabled={busy}
+          className={`flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all ${
+            busy
+              ? "opacity-70 cursor-not-allowed"
+              : "active:scale-95"
+          }`}
         >
-          Sign in with Google
+          {busy && (
+            <span
+              className="inline-block h-5 w-5 rounded-full border-2 border-current border-t-transparent animate-spin"
+              aria-hidden="true"
+            />
+          )}
+          {busy ? "Signing in\u2026" : "Sign in with Google"}
         </button>
       </section>
 

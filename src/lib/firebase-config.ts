@@ -45,6 +45,19 @@ function getDb(): Firestore {
 function getFirebaseAuth(): Auth {
     if (!_auth) {
         _auth = getAuth(getFirebaseApp());
+
+        // Configure auth persistence — must run client-side only
+        if (typeof window !== 'undefined') {
+            import('firebase/auth').then(({ setPersistence, indexedDBLocalPersistence, browserLocalPersistence }) => {
+                setPersistence(_auth!, indexedDBLocalPersistence).catch(() => {
+                    // IndexedDB unavailable (e.g. iOS Safari private mode) — fall back to localStorage
+                    setPersistence(_auth!, browserLocalPersistence).catch(() => {
+                        // Both failed — session will still work, just won't persist across tabs
+                        console.warn('[Auth] Could not set persistence. Session may not persist.');
+                    });
+                });
+            });
+        }
     }
     return _auth;
 }

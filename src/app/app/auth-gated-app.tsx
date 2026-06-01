@@ -28,6 +28,14 @@ export function AuthGatedApp({
   const router = useRouter();
   const [pandals, setPandals] = useState<Pandal[]>(initialPandals);
   const [hasError, setHasError] = useState(!!initialFetchError);
+  const [hydrationDelay, setHydrationDelay] = useState(true);
+
+  // Brief delay to let Firebase resolve redirect-result auth before making
+  // any redirect decisions — prevents false "unauthenticated" flashes.
+  useEffect(() => {
+    const timer = setTimeout(() => setHydrationDelay(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // If server-side fetch failed, attempt client-side fetch
   useEffect(() => {
@@ -52,16 +60,17 @@ export function AuthGatedApp({
   }, [initialFetchError, pandals.length]);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading || hydrationDelay) return;
+    if (!user) {
       // Preserve the deep-link pandal ID through the sign-in redirect
       if (initialSelectedPandalId) {
         localStorage.setItem("pendingPandalId", initialSelectedPandalId);
       }
       router.replace("/");
     }
-  }, [loading, user, router, initialSelectedPandalId]);
+  }, [loading, user, hydrationDelay, router, initialSelectedPandalId]);
 
-  if (loading) {
+  if (loading || hydrationDelay) {
     return <SplashScreen />;
   }
 

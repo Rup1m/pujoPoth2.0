@@ -1,43 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  signInWithCredential,
   signOut as firebaseSignOut,
   type User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-config";
-
-/** Minimal type declarations for Google Identity Services (GSI). */
-interface GoogleCredentialResponse {
-  credential: string;
-  select_by: string;
-}
-
-interface GoogleAccountsId {
-  initialize(config: {
-    client_id: string;
-    callback: (response: GoogleCredentialResponse) => void;
-    auto_select?: boolean;
-    cancel_on_tap_outside?: boolean;
-  }): void;
-  prompt(): void;
-}
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: GoogleAccountsId;
-      };
-    };
-  }
-}
 
 const LS_KEY = "pujopath_uid";
 
@@ -46,41 +19,43 @@ const SILENT_ERROR_CODES = new Set([
   "auth/popup-closed-by-user",
   "auth/cancelled-popup-request",
   "auth/user-cancelled",
+  "auth/redirect-cancelled-by-user",
+  "auth/popup-blocked",
 ]);
 
 /**
- * Detects whether the current browser context is likely to block popups:
- *  - Mobile devices (phones/tablets)
- *  - In-app browsers (Instagram, Facebook, WhatsApp, etc.)
- *  - PWA / standalone display mode
+ * Detects whether the current device is mobile.
+ * Checks viewport width first, then falls back to UA sniffing.
+ * Includes iPad (iPadOS 13+ reports desktop UA but has touch).
  */
-function shouldUseRedirect(): boolean {
+function isMobile(): boolean {
   if (typeof window === "undefined") return false;
-
+  if (window.innerWidth < 768) return true;
   const ua = navigator.userAgent || "";
-
-  // Mobile device check
-  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(ua);
-
-  // In-app browser detection (Instagram, Facebook, WhatsApp, Line, etc.)
-  const isInAppBrowser = /FBAN|FBAV|Instagram|Line|WhatsApp|Snapchat|Twitter|Weibo/i.test(ua);
-
-  // PWA / standalone mode
-  const isStandalone =
-    window.matchMedia?.("(display-mode: standalone)")?.matches ||
-    (navigator as { standalone?: boolean }).standalone === true;
-
-  return isMobile || isInAppBrowser || isStandalone;
+  if (/Android|iPhone/i.test(ua)) return true;
+  // iPadOS 13+ sends a Mac UA — detect via touch + platform
+  if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) return true;
+  return false;
 }
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
+  const mountedRef = useRef(true);
 
-  // ── Listen to auth state changes ─────────────────────────────────────────
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth(), (firebaseUser) => {
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  // ── Auth state listener + redirect result handler ─────────────────────────
+  // Combined into one effect to guarantee onAuthStateChanged is attached
+  // BEFORE getRedirectResult resolves. This prevents a race on mobile where
+  // the redirect result could resolve before the listener is attached.
+  useEffect(() => {
+    const authInstance = auth();
+
+    const unsubscribe = onAuthStateChanged(authInstance, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
 
@@ -99,15 +74,12 @@ export function useAuth() {
       }
     });
 
-    return unsubscribe;
-  }, []);
-
-  // ── Handle redirect result on mount (for mobile sign-in flow) ──────────
-  useEffect(() => {
-    getRedirectResult(auth())
+    // Process any pending redirect result (mobile sign-in flow).
+    // onAuthStateChanged above will automatically pick up the user —
+    // this call just ensures Firebase processes the redirect URL params.
+    getRedirectResult(authInstance)
       .then((result) => {
         if (result?.user) {
-          // onAuthStateChanged will pick this up — no extra action needed
           console.log("[useAuth] Redirect sign-in succeeded");
         }
       })
@@ -117,6 +89,8 @@ export function useAuth() {
           console.error("[useAuth] Redirect sign-in failed:", code, err);
         }
       });
+
+    return unsubscribe;
   }, []);
 
   const signIn = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
@@ -127,21 +101,21 @@ export function useAuth() {
     try {
       const provider = new GoogleAuthProvider();
 
-      if (shouldUseRedirect()) {
-        // Mobile / in-app browser: redirect-based flow (won't return from here)
+      if (isMobile()) {
+        // Mobile: redirect-based flow (page navigates away)
         await signInWithRedirect(auth(), provider);
         // Page will navigate away — return optimistically
         return { success: true };
       }
 
-      // Desktop: popup-based flow
+      // Desktop: popup-based flow with redirect fallback
       try {
         await signInWithPopup(auth(), provider);
         return { success: true };
       } catch (popupErr: unknown) {
         const popupCode = (popupErr as { code?: string })?.code ?? "";
 
-        // If popup was blocked, fall back to redirect
+        // If popup was blocked by the browser, silently fall back to redirect
         if (popupCode === "auth/popup-blocked") {
           await signInWithRedirect(auth(), provider);
           return { success: true };
@@ -161,7 +135,8 @@ export function useAuth() {
       console.error("[useAuth] signIn failed:", code, message);
       return { success: false, error: code || message };
     } finally {
-      setSigningIn(false);
+      // Guard against setState on unmounted component (redirect navigates away)
+      if (mountedRef.current) setSigningIn(false);
     }
   }, [signingIn]);
 
@@ -178,30 +153,5 @@ export function useAuth() {
     }
   }, []);
 
-  const initializeOneTap = useCallback(() => {
-    if (typeof window === 'undefined' || !window.google) return;
-
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!clientId) return;
-
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: async (response: GoogleCredentialResponse) => {
-        try {
-          const credential = GoogleAuthProvider.credential(response.credential);
-          await signInWithCredential(auth(), credential);
-          // onAuthStateChanged handles state update + navigation
-        } catch (err) {
-          console.error('[useAuth] One-Tap sign-in failed:', err);
-        }
-      },
-      auto_select: false,
-      cancel_on_tap_outside: false,
-    });
-
-    window.google.accounts.id.prompt();
-  }, []);
-
-  return { user, loading, signingIn, signIn, signOut, initializeOneTap };
+  return { user, loading, signingIn, signIn, signOut };
 }
-
