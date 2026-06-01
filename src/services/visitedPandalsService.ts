@@ -21,18 +21,18 @@ function setStoredIds(ids: string[]) {
   }
 }
 
-export async function markVisited(pandal: Pandal): Promise<void> {
+export function markVisited(pandal: Pandal): void {
   const ids = new Set(getStoredIds());
   ids.add(pandal.id);
   setStoredIds(Array.from(ids));
 }
 
-export async function unmarkVisited(pandalId: string): Promise<void> {
+export function unmarkVisited(pandalId: string): void {
   const ids = new Set(getStoredIds());
   ids.delete(pandalId);
   setStoredIds(Array.from(ids));
 }
 
-export async function getVisitedPandals(): Promise<string[]> {
+export function getVisitedPandals(): string[] {
   return getStoredIds();
 }

@@ -47,7 +47,6 @@ export interface MapContainerProps {
   selectedPandalId: string | null;
   visitedIds: Set<string>;
   onPandalSelect: (pandal: Pandal) => void;
-  onPandalDeselect: () => void;
 }
 
 /**
@@ -64,34 +63,7 @@ export const MapContainer = memo(function MapContainer({
   selectedPandalId,
   visitedIds,
   onPandalSelect,
-  onPandalDeselect,
 }: MapContainerProps) {
-  /** Bridge the custom DOM event emitted by PandalSearch up to the parent.
-   *  Wrapped in try-catch to gracefully handle malformed events. */
-  const handlePandalSelectEvent = useCallback(
-    (event: Event) => {
-      try {
-        const pandal = (event as CustomEvent<Pandal>).detail;
-        if (pandal && pandal.id) {
-          onPandalSelect(pandal);
-        } else {
-          onPandalDeselect();
-        }
-      } catch (error) {
-        console.error("[MapContainer] Error handling pandalSelected event:", error);
-        // Fail gracefully without crashing
-      }
-    },
-    [onPandalSelect, onPandalDeselect]
-  );
-
-  useEffect(() => {
-    window.addEventListener("pandalSelected", handlePandalSelectEvent);
-    return () => {
-      window.removeEventListener("pandalSelected", handlePandalSelectEvent);
-    };
-  }, [handlePandalSelectEvent]);
-
   return (
     <Map
       defaultCenter={initialCenter}

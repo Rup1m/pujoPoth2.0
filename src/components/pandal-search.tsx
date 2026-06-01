@@ -20,7 +20,7 @@ const KEYS = {
   ESCAPE: "Escape",
 } as const;
 
-function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
+export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { pandals: Pandal[], onSelect: (pandal: Pandal) => void }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Pandal[]>([]);
   const [totalMatches, setTotalMatches] = useState(0);
@@ -147,8 +147,8 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
       source: "search",
     });
 
-    // Fire a custom event for the map to listen to
-    window.dispatchEvent(new CustomEvent("pandalSelected", { detail: pandal }));
+    // Directly call the parent's handler instead of firing a sloppy DOM event
+    onSelect(pandal);
   };
 
   const handleClear = () => {
@@ -280,6 +280,5 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
       )}
     </div>
   );
-}
+});
 
-export const PandalSearch = memo(PandalSearchComponent);

@@ -270,8 +270,8 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
 
   return (
     <>
-      {/* Search bar — emits custom DOM events consumed by MapContainer */}
-      <PandalSearch pandals={initialPandals} />
+      {/* Search bar */}
+      <PandalSearch pandals={initialPandals} onSelect={handlePandalSelect} />
 
       {/* Pure map + markers */}
       <MapContainer
@@ -281,7 +281,6 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
         selectedPandalId={selectedPandal?.id ?? null}
         visitedIds={visitedIds}
         onPandalSelect={handlePandalSelect}
-        onPandalDeselect={handlePandalDeselect}
       />
 
       {/* Detail sheet — lazy loaded */}
