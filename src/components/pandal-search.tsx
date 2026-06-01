@@ -23,6 +23,7 @@ const KEYS = {
 function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Pandal[]>([]);
+  const [totalMatches, setTotalMatches] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -36,6 +37,7 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
   const fetchSuggestions = useCallback((searchQuery: string) => {
     if (searchQuery.length < 2) {
       setSuggestions([]);
+      setTotalMatches(0);
       setShowSuggestions(false);
       setSelectedIndex(-1);
       return;
@@ -48,16 +50,19 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
     const lowerCaseQuery = searchQuery.toLowerCase();
     trackEvent('search_performed', { query: searchQuery, length: searchQuery.length });
 
-    const results = pandals
+    const filtered = pandals
       .filter((p) => {
         const searchableName = p.name_lowercase || p.name.toLowerCase();
-        const searchableBengaliName = p.name_bengali_lowercase || p.name_bengali?.toLowerCase();
+        const searchableBengaliName = p.name_bengali_lowercase || p.name_bengali?.toLowerCase() || "";
         return (
           searchableName.includes(lowerCaseQuery) ||
-          (searchableBengaliName && searchableBengaliName.includes(lowerCaseQuery))
+          searchableBengaliName.includes(lowerCaseQuery)
         );
-      })
-      // Prioritize exact prefix matches and popular pandals
+      });
+
+    setTotalMatches(filtered.length);
+
+    const results = filtered
       .sort((a, b) => {
         const aNameLower = a.name_lowercase || a.name.toLowerCase();
         const bNameLower = b.name_lowercase || b.name.toLowerCase();
@@ -91,6 +96,7 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
   useEffect(() => {
     if (query.length < 2) {
       setSuggestions([]);
+      setTotalMatches(0);
       setShowSuggestions(false);
       setSelectedIndex(-1);
     }
@@ -148,6 +154,7 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
   const handleClear = () => {
     setQuery("");
     setSuggestions([]);
+    setTotalMatches(0);
     setShowSuggestions(false);
     setSelectedIndex(-1);
     inputRef.current?.focus();
@@ -255,9 +262,9 @@ function PandalSearchComponent({ pandals }: { pandals: Pandal[] }) {
                   </li>
                 ))}
               </ul>
-              {suggestions.length >= MAX_RESULTS && (
+              {totalMatches > MAX_RESULTS && (
                 <p className="text-xs text-muted-foreground text-center py-2 px-4">
-                  Showing {MAX_RESULTS} of {suggestions.length} results
+                  Showing {MAX_RESULTS} of {totalMatches} results
                 </p>
               )}
             </>

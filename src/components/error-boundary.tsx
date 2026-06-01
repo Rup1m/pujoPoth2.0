@@ -36,8 +36,8 @@ export class ErrorBoundary extends React.Component<
     this.setState({ errorInfo });
 
     // Send error to analytics if available
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "exception", {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "exception", {
         description: `${error.name}: ${error.message}`,
         fatal: true,
       });

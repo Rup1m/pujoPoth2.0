@@ -110,8 +110,15 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
   const { directions, isFetchingDirections, fetchDirections, clearDirections } = useDirections();
   const { visitedIds, toggleVisited } = useVisitedPandals();
 
-  const [displayedPandals, setDisplayedPandals] =
-    useState<Pandal[]>(initialPandals);
+  const [displayedPandals, setDisplayedPandals] = useState<Pandal[]>(() => 
+    initialPandals.filter(
+      (p) =>
+        typeof p.latitude === "number" &&
+        typeof p.longitude === "number" &&
+        isFinite(p.latitude) &&
+        isFinite(p.longitude)
+    )
+  );
   const [selectedPandal, setSelectedPandal] = useState<Pandal | null>(null);
   const [suggestedPandals, setSuggestedPandals] = useState<
     (Pandal & { distance: number })[]
@@ -228,9 +235,16 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
   // ── Filter handler ────────────────────────────────────────────────────────
 
   const handleFilterChange = useCallback(
-    async (filters: Filters) => {
-      const filtered = await getFilteredPandals(initialPandals, filters);
-      setDisplayedPandals(filtered);
+    (filters: Filters) => {
+      const filtered = getFilteredPandals(initialPandals, filters);
+      const validFiltered = filtered.filter(
+        (p) =>
+          typeof p.latitude === "number" &&
+          typeof p.longitude === "number" &&
+          isFinite(p.latitude) &&
+          isFinite(p.longitude)
+      );
+      setDisplayedPandals(validFiltered);
       setSelectedPandal(null);
       setSuggestedPandals([]);
       clearDirections();
@@ -281,6 +295,7 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
           onSuggestionSelect={handlePandalSelect}
           onClose={handlePandalDeselect}
           onToggleVisited={toggleVisited}
+          visitedIds={visitedIds}
         />
       )}
 
@@ -290,8 +305,6 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
         onFilterChange={handleFilterChange}
         isAboutOpen={isAboutOpen}
         onAboutOpenChange={setIsAboutOpen}
-        visitedIds={visitedIds}
-        allPandals={initialPandals}
       />
       {/* Location denied banner */}
       {locationDenied && (

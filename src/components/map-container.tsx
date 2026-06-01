@@ -108,24 +108,16 @@ export const MapContainer = memo(function MapContainer({
           <div className="relative h-16 w-16 flex items-center justify-center">
             <div className="absolute h-5 w-5 rounded-full bg-primary ring-4 ring-background z-10" />
             <div
-              className="absolute h-full w-full rounded-full bg-primary/40 border-2 border-primary/90 animate-pulse-marker"
-              style={{ animationDelay: "-1s" }}
+              className="absolute h-full w-full rounded-full bg-primary/40 border-2 border-primary/90 animate-pulse-marker will-change-transform"
+              style={{ animationDelay: "-1s", transform: "translateZ(0)" }}
             />
-            <div className="absolute h-full w-full rounded-full bg-primary/40 border-2 border-primary/90 animate-pulse-marker" />
+            <div className="absolute h-full w-full rounded-full bg-primary/40 border-2 border-primary/90 animate-pulse-marker will-change-transform" style={{ transform: "translateZ(0)" }} />
           </div>
         </AdvancedMarker>
       )}
 
       {/* ── Pandal markers ───────────────────────────────── */}
-      {pandals
-        .filter(
-          (p) =>
-            typeof p.latitude === "number" &&
-            typeof p.longitude === "number" &&
-            isFinite(p.latitude) &&
-            isFinite(p.longitude)
-        )
-        .map((pandal) => (
+      {pandals.map((pandal) => (
           <AdvancedMarker
             key={pandal.id}
             position={{ lat: pandal.latitude, lng: pandal.longitude }}

@@ -50,6 +50,9 @@ export function useDirections(): UseDirectionsReturn {
   const [isFetchingDirections, setIsFetchingDirections] = useState(false);
   const requestIdRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // Local cache to make directions perfectly fault-tolerant and instantaneous
+  const cacheRef = useRef<Map<string, DirectionsOutput>>(new Map());
 
   const fetchDirections = useCallback(
     async (origin: LatLng, destination: LatLng) => {
@@ -57,6 +60,15 @@ export function useDirections(): UseDirectionsReturn {
       if (!origin || !destination || !isFinite(origin.lat) || !isFinite(destination.lat)) {
         console.warn("[useDirections] Invalid origin or destination coordinates");
         setDirections(null);
+        return;
+      }
+
+      // Generate cache key
+      const cacheKey = `${origin.lat.toFixed(5)},${origin.lng.toFixed(5)}-${destination.lat.toFixed(5)},${destination.lng.toFixed(5)}`;
+      
+      // Check cache first
+      if (cacheRef.current.has(cacheKey)) {
+        setDirections(cacheRef.current.get(cacheKey)!);
         return;
       }
 
@@ -80,7 +92,9 @@ export function useDirections(): UseDirectionsReturn {
 
         // Only apply if this is still the most recent request
         if (requestIdRef.current !== currentRequestId) return;
+        
         setDirections(result);
+        cacheRef.current.set(cacheKey, result);
       } catch (err) {
         // Only apply if this is still the most recent request
         if (requestIdRef.current !== currentRequestId) return;

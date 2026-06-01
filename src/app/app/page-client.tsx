@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useFirstLocationPrompt } from "@/hooks/use-first-location-prompt";
 import { ErrorBoundary } from "@/components/error-boundary";
 import PujoMap from "@/components/pujo-map";
 import type { Pandal } from "@/lib/types";
@@ -25,10 +24,6 @@ export function AppPageClient({
   initialPandals,
   initialSelectedPandalId,
 }: AppPageClientProps) {
-  // This hook automatically requests location on first visit
-  // using localStorage to ensure it only happens once
-  useFirstLocationPrompt();
-
   // Small state to ensure hydration safety
   const [isMounted, setIsMounted] = useState(false);
 

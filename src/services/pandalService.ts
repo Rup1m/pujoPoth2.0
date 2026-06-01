@@ -64,10 +64,10 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
 });
 
 
-export async function getFilteredPandals(
+export function getFilteredPandals(
   allPandals: Pandal[],
   filters: Filters
-): Promise<Pandal[]> {
+): Pandal[] {
     const { north, south, central, bonedi, metro } = filters;
     
     // If metro is selected, show only metro stations

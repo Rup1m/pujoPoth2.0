@@ -20,11 +20,11 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
     const size = isSelected ? 32 : 24;
     return (
         <div
-            className="relative transition-all duration-300 flex items-center justify-center"
+            className="relative transition-all duration-300 flex items-center justify-center will-change-transform"
             style={{
                 width: size,
                 height: size,
-                transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                transform: `scale(${isSelected ? 1.1 : 1}) translateZ(0)`,
             }}
         >
             <div 
@@ -34,8 +34,8 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
             <TramFront className="w-2/3 h-2/3 text-foreground relative z-10" style={{ color: metroColor }}/>
             {isSelected && (
                 <div 
-                    className="absolute inset-0 rounded-full animate-pulse"
-                    style={{ backgroundColor: metroColor, opacity: 0.4 }} 
+                    className="absolute inset-0 rounded-full animate-pulse will-change-transform"
+                    style={{ backgroundColor: metroColor, opacity: 0.4, transform: "translateZ(0)" }} 
                 />
             )}
         </div>
@@ -47,15 +47,15 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
   
   return (
     <div
-      className="relative transition-all duration-300"
+      className="relative transition-all duration-300 will-change-transform"
       style={{
         width: size,
         height: size,
-        transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+        transform: `scale(${isSelected ? 1.1 : 1}) translateZ(0)`,
       }}
     >
       {isSelected && (
-        <div className="absolute inset-0 bg-primary/50 rounded-full animate-pulse" />
+        <div className="absolute inset-0 bg-primary/50 rounded-full animate-pulse will-change-transform" style={{ transform: "translateZ(0)" }} />
       )}
       {isVisited && (
         <div

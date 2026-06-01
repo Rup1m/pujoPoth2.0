@@ -16,6 +16,7 @@ export type AnalyticsEvent =
   | 'pandal_clicked'
   | 'search_performed'
   | 'filter_applied'
+  | 'filter_cleared'
   | 'directions_requested'
   | 'language_switched';
 
