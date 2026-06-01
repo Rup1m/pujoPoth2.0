@@ -27,6 +27,12 @@ export const locales = {
     locationUnavailable: 'Your location information is currently unavailable.',
     locationTimeout: 'The request to get your location timed out.',
     locationErrorUnknown: 'An unknown error occurred while getting your location.',
+
+    // Install Prompt
+    installApp: 'Install App',
+    installAppDescription: 'Access Pujoपথ directly from your home screen',
+    install: 'Install',
+    close: 'Close',
   },
   bn: {
     // Search
@@ -55,6 +61,12 @@ export const locales = {
     locationUnavailable: 'আপনার অবস্থানের তথ্য বর্তমানে অনুপলব্ধ।',
     locationTimeout: 'আপনার অবস্থান পাওয়ার অনুরোধের সময় শেষ হয়েছে।',
     locationErrorUnknown: 'আপনার অবস্থান পাওয়ার সময় একটি অজানা ত্রুটি ঘটেছে।',
+
+    // Install Prompt
+    installApp: 'অ্যাপ ইনস্টল করুন',
+    installAppDescription: 'আপনার হোম স্ক্রীন থেকে সরাসরি পুজোপথ অ্যাক্সেস করুন',
+    install: 'ইনস্টল করুন',
+    close: 'বন্ধ করুন',
   },
 };
 

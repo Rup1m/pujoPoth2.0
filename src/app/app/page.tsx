@@ -1,8 +1,7 @@
 
 import { getPandals } from '@/services/pandalService';
-import { ErrorBoundary } from '@/components/error-boundary';
-import PujoMap from '@/components/pujo-map';
 import type { Pandal } from '@/lib/types';
+import { AppPageClient } from './page-client';
 
 /**
  * Dynamic route prevents prerendering at build time (when Firebase credentials may be unavailable).
@@ -19,24 +18,21 @@ export default async function AppPage({
   // Fetch pandals on the server to make initial load faster.
   // With force-dynamic, this runs on each request (not at build time).
   let pandals: Pandal[] = [];
-  let fetchError: string | null = null;
 
   try {
     pandals = await getPandals();
   } catch {
-    fetchError = 'Failed to load pandals';
+    // On error, still render with empty pandals array
+    // PujoMap will handle the error state
+    console.error('Failed to load pandals');
   }
 
   const { pandal: initialSelectedPandalId } = await searchParams;
 
   return (
-    <main className="h-screen w-screen overflow-hidden">
-      <ErrorBoundary>
-        <PujoMap 
-          initialPandals={pandals} 
-          initialSelectedPandalId={initialSelectedPandalId}
-        />
-      </ErrorBoundary>
-    </main>
+    <AppPageClient
+      initialPandals={pandals}
+      initialSelectedPandalId={initialSelectedPandalId}
+    />
   );
 }

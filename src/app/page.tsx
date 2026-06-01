@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 /**
  * Wrapper that provides the Suspense boundary required by useSearchParams()
@@ -25,14 +26,23 @@ export default function LandingPage() {
 function LandingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleExplore = () => {
+    // Prevent multiple clicks
+    if (isLoading) return;
+
+    setIsLoading(true);
     const pandal = searchParams.get("pandal");
-    if (pandal) {
-      router.push(`/app?pandal=${pandal}`);
-    } else {
-      router.push("/app");
-    }
+    
+    // Use requestAnimationFrame to ensure animation frame is painted
+    requestAnimationFrame(() => {
+      if (pandal) {
+        router.push(`/app?pandal=${pandal}`);
+      } else {
+        router.push("/app");
+      }
+    });
   };
 
   // ── Unauthenticated — landing page ─────────────────────────────────────────
@@ -59,9 +69,21 @@ function LandingPageContent() {
         {/* CTA */}
         <button
           onClick={handleExplore}
-          className="flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all active:scale-95"
+          disabled={isLoading}
+          className={`flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all active:scale-95 ${
+            isLoading
+              ? "opacity-80 scale-95 cursor-wait"
+              : "hover:bg-primary/90 active:scale-95"
+          }`}
         >
-          Start Exploring
+          {isLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Loading...</span>
+            </>
+          ) : (
+            "Start Exploring"
+          )}
         </button>
       </section>
 
