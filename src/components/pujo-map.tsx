@@ -108,7 +108,7 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
   const { text } = useLanguage();
   const { toast } = useToast();
   const { directions, isFetchingDirections, fetchDirections, clearDirections } = useDirections();
-  const { visitedIds, toggleVisited } = useVisitedPandals(null);
+  const { visitedIds, toggleVisited } = useVisitedPandals();
 
   const [displayedPandals, setDisplayedPandals] =
     useState<Pandal[]>(initialPandals);
@@ -280,9 +280,7 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
           suggestions={suggestedPandals}
           onSuggestionSelect={handlePandalSelect}
           onClose={handlePandalDeselect}
-          visitedIds={visitedIds}
           onToggleVisited={toggleVisited}
-          userId={null}
         />
       )}
 

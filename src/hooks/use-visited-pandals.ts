@@ -9,42 +9,26 @@ import {
 } from "@/services/visitedPandalsService";
 import type { Pandal } from "@/lib/types";
 
-export function useVisitedPandals(userId: string | null | undefined) {
+export function useVisitedPandals() {
   const [visitedIds, setVisitedIds] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // ── Fetch visited pandals on mount / userId change ────────────────────────
   useEffect(() => {
-    if (!userId) {
-      setVisitedIds(new Set());
-      return;
-    }
-
     let cancelled = false;
-    setIsLoading(true);
-
-    getVisitedPandals(userId)
-      .then((ids) => {
-        if (!cancelled) setVisitedIds(new Set(ids));
-      })
-      .catch((err) => {
-        console.error("[useVisitedPandals] fetch failed:", err);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
+    getVisitedPandals().then((ids) => {
+      if (!cancelled) {
+        setVisitedIds(new Set(ids));
+        setIsLoading(false);
+      }
+    });
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, []);
 
-  // ── Toggle visited/unvisited with optimistic UI ───────────────────────────
   const toggleVisited = useCallback(
     async (pandal: Pandal) => {
-      if (!userId) return;
-
       const wasVisited = visitedIds.has(pandal.id);
 
       // Optimistic update
@@ -60,9 +44,9 @@ export function useVisitedPandals(userId: string | null | undefined) {
 
       try {
         if (wasVisited) {
-          await unmarkVisited(userId, pandal.id);
+          await unmarkVisited(pandal.id);
         } else {
-          await markVisited(userId, pandal);
+          await markVisited(pandal);
         }
       } catch (err) {
         console.error("[useVisitedPandals] toggle failed:", err);
@@ -85,7 +69,7 @@ export function useVisitedPandals(userId: string | null | undefined) {
         });
       }
     },
-    [userId, visitedIds, toast]
+    [visitedIds, toast]
   );
 
   return { visitedIds, toggleVisited, isLoading };

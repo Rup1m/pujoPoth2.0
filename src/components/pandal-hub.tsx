@@ -22,7 +22,6 @@ interface PandalHubProps {
     onClose: () => void;
     visitedIds: Set<string>;
     onToggleVisited: (pandal: Pandal) => void;
-    userId: string | null;
 }
 
 const TravelModeDisplay = ({ icon: Icon, time, label }: { icon: React.ElementType, time: string | null | undefined, label: string }) => {
@@ -50,7 +49,6 @@ export function PandalHub({
   onClose,
   visitedIds,
   onToggleVisited,
-  userId,
 }: PandalHubProps) {
   const { language, text } = useLanguage();
   const { toast } = useToast();
@@ -118,10 +116,6 @@ export function PandalHub({
                   variant="ghost"
                   size="icon"
                   onClick={() => {
-                    if (!userId) {
-                      toast({ title: "Sign in to track visited pandals", variant: "destructive" });
-                      return;
-                    }
                     onToggleVisited(pandal);
                   }}
                   className="h-11 w-11 rounded-full"

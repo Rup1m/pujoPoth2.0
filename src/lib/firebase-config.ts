@@ -1,6 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
-import { getAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -24,7 +23,6 @@ const firebaseConfig = {
 
 let _app: FirebaseApp | null = null;
 let _db: Firestore | null = null;
-let _auth: Auth | null = null;
 
 function getFirebaseApp(): FirebaseApp {
     if (!_app) {
@@ -41,14 +39,6 @@ function getDb(): Firestore {
     return _db;
 }
 
-/** Auth instance — safe to call at request time. */
-function getFirebaseAuth(): Auth {
-    if (!_auth) {
-        _auth = getAuth(getFirebaseApp());
-    }
-    return _auth;
-}
-
-export { getDb as db, getFirebaseAuth as auth, getFirebaseApp as app };
+export { getDb as db, getFirebaseApp as app };
 
 
