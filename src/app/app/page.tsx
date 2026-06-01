@@ -1,7 +1,7 @@
 
 import { getPandals } from '@/services/pandalService';
-import { AuthGatedApp } from './auth-gated-app';
 import { ErrorBoundary } from '@/components/error-boundary';
+import PujoMap from '@/components/pujo-map';
 import type { Pandal } from '@/lib/types';
 
 /**
@@ -32,10 +32,9 @@ export default async function AppPage({
   return (
     <main className="h-screen w-screen overflow-hidden">
       <ErrorBoundary>
-        <AuthGatedApp 
+        <PujoMap 
           initialPandals={pandals} 
           initialSelectedPandalId={initialSelectedPandalId}
-          initialFetchError={fetchError}
         />
       </ErrorBoundary>
     </main>

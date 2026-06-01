@@ -1,9 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState, useRef } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
+import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
@@ -25,77 +23,15 @@ export default function LandingPage() {
 }
 
 function LandingPageContent() {
-  const { user, loading, signingIn, signIn } = useAuth();
-  const [isSigningIn, setIsSigningIn] = useState(false);
-  const mountedRef = useRef(true);
-
-  useEffect(() => {
-    return () => { mountedRef.current = false; };
-  }, []);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
-  // Stash a pending pandal deep-link ID so it survives the sign-in redirect.
-  useEffect(() => {
-    const pendingPandal = searchParams.get("pandal");
-    if (pendingPandal) {
-      localStorage.setItem("pendingPandalId", pendingPandal);
-    }
-  }, [searchParams]);
-
-  // Redirect authenticated users straight to /app.
-  // This fires both on initial load (returning user) AND after a fresh sign-in
-  // because onAuthStateChanged sets `user`, which triggers this effect.
-  // This is the SINGLE source of truth for post-auth navigation — no router
-  // call inside handleExplore, which eliminates the race condition.
-  useEffect(() => {
-    if (!loading && user) {
-      console.log('[LandingPage] User authenticated, redirecting to /app:', user.email);
-      const pendingId = localStorage.getItem("pendingPandalId");
-      localStorage.removeItem("pendingPandalId");
-      if (pendingId) {
-        console.log('[LandingPage] Redirecting with pandal ID:', pendingId);
-        router.replace(`/app?pandal=${pendingId}`);
-      } else {
-        router.replace("/app");
-      }
-    }
-  }, [loading, user, router]);
-
-
-  // ── Loading state ──────────────────────────────────────────────────────────
-  if (loading || user) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Skeleton className="h-12 w-48 rounded-lg" />
-      </div>
-    );
-  }
-
-  // ── CTA handler ─────────────────────────────────────────────────────────────
-  const busy = isSigningIn || signingIn;
-
-  const handleSignIn = async () => {
-    if (busy) return;
-    setIsSigningIn(true);
-
-    try {
-      const result = await signIn();
-
-      // On mobile redirect, signIn() navigates away — this line won't run.
-      // Only toast on actual errors — not on user cancelling the popup.
-      if (result.error) {
-        toast({
-          title: "Sign in failed",
-          description: result.error.startsWith("auth/")
-            ? "Please check your internet connection and try again."
-            : "Please try again.",
-          variant: "destructive",
-        });
-      }
-    } finally {
-      if (mountedRef.current) setIsSigningIn(false);
+  const handleExplore = () => {
+    const pandal = searchParams.get("pandal");
+    if (pandal) {
+      router.push(`/app?pandal=${pandal}`);
+    } else {
+      router.push("/app");
     }
   };
 
@@ -122,21 +58,10 @@ function LandingPageContent() {
 
         {/* CTA */}
         <button
-          onClick={handleSignIn}
-          disabled={busy}
-          className={`flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all ${
-            busy
-              ? "opacity-70 cursor-not-allowed"
-              : "active:scale-95"
-          }`}
+          onClick={handleExplore}
+          className="flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all active:scale-95"
         >
-          {busy && (
-            <span
-              className="inline-block h-5 w-5 rounded-full border-2 border-current border-t-transparent animate-spin"
-              aria-hidden="true"
-            />
-          )}
-          {busy ? "Signing in\u2026" : "Sign in with Google"}
+          Start Exploring
         </button>
       </section>
 

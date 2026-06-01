@@ -31,7 +31,6 @@ import { useLanguage } from "@/hooks/use-language";
 import { useLocation } from "@/hooks/use-location";
 import { useDirections } from "@/hooks/use-directions";
 import { useVisitedPandals } from "@/hooks/use-visited-pandals";
-import { useAuth } from "@/hooks/use-auth";
 import type { Pandal } from "@/lib/types";
 import { getFilteredPandals } from "@/services/pandalService";
 import type { Filters } from "@/components/filter-panel";
@@ -96,7 +95,6 @@ interface MapCoreProps {
   locationDenied: boolean;
   initialPandals: Pandal[];
   initialCenter: { lat: number; lng: number };
-  userId?: string;
   initialSelectedPandalId?: string;
 }
 
@@ -105,13 +103,12 @@ interface MapCoreProps {
  * It orchestrates pandal selection, suggestion calculation, filtering,
  * and imperative map navigation — delegating all rendering to focused children.
  */
-function MapCore({ location, locationDenied, initialPandals, initialCenter, userId, initialSelectedPandalId }: MapCoreProps) {
+function MapCore({ location, locationDenied, initialPandals, initialCenter, initialSelectedPandalId }: MapCoreProps) {
   const mapInstance = useMap();
   const { text } = useLanguage();
   const { toast } = useToast();
   const { directions, isFetchingDirections, fetchDirections, clearDirections } = useDirections();
-  const { visitedIds, toggleVisited } = useVisitedPandals(userId ?? null);
-  const { user: firebaseUser } = useAuth();
+  const { visitedIds, toggleVisited } = useVisitedPandals(null);
 
   const [displayedPandals, setDisplayedPandals] =
     useState<Pandal[]>(initialPandals);
@@ -285,7 +282,7 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, user
           onClose={handlePandalDeselect}
           visitedIds={visitedIds}
           onToggleVisited={toggleVisited}
-          userId={userId ?? null}
+          userId={null}
         />
       )}
 
@@ -295,7 +292,6 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, user
         onFilterChange={handleFilterChange}
         isAboutOpen={isAboutOpen}
         onAboutOpenChange={setIsAboutOpen}
-        user={firebaseUser}
         visitedIds={visitedIds}
         allPandals={initialPandals}
       />
@@ -329,11 +325,9 @@ const DynamicMapCore = dynamic(() => Promise.resolve(memo(MapCore)), {
 
 export default function PujoMap({
   initialPandals,
-  userId,
   initialSelectedPandalId,
 }: {
   initialPandals: Pandal[];
-  userId?: string;
   initialSelectedPandalId?: string;
 }) {
   const [isClient, setIsClient] = useState(false);
@@ -423,7 +417,6 @@ export default function PujoMap({
           locationDenied={locationDenied}
           initialPandals={initialPandals}
           initialCenter={mapCenter}
-          userId={userId}
           initialSelectedPandalId={initialSelectedPandalId}
         />
       </APIProvider>
