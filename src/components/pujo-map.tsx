@@ -21,7 +21,7 @@ import {
   APIProvider,
   useMap,
 } from "@vis.gl/react-google-maps";
-import { useState, useEffect, useCallback, useRef, memo } from "react";
+import { useState, useEffect, useCallback, useRef, memo, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -209,19 +209,16 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
     if (
       initialSelectedPandalId &&
       initialPandals.length > 0 &&
-      !deepLinkHandledRef.current
+      !deepLinkHandledRef.current &&
+      mapInstance // Wait deterministically for the Google Map engine to be ready
     ) {
       const target = initialPandals.find((p) => p.id === initialSelectedPandalId);
       if (target) {
         deepLinkHandledRef.current = true;
-        // Delay to ensure the map tiles and markers are fully initialised
-        const timer = setTimeout(() => {
-          handlePandalSelect(target);
-        }, 500);
-        return () => clearTimeout(timer);
+        handlePandalSelect(target);
       }
     }
-  }, [initialSelectedPandalId, initialPandals, handlePandalSelect]);
+  }, [initialSelectedPandalId, initialPandals, handlePandalSelect, mapInstance]);
 
   // ── Recenter handler ──────────────────────────────────────────────────────
 
@@ -347,8 +344,9 @@ export default function PujoMap({
   const { location, mapCenter, status, locationDenied, getLocation } = useLocation();
 
   // ── Client-side initialisation ────────────────────────────────────────────
+  const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const storedLang = localStorage.getItem("lang");
     if (storedLang) {
       // Returning user: bypass splash + language screen entirely
