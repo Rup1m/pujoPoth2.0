@@ -15,14 +15,14 @@
 | 4 | `unstable_cache` → `React.cache()` + ISR `revalidate: 600` | ✅ Done |
 | 5 | API key exposed → server-only key created | ✅ Done |
 | 6 | Hardcoded 2.5s splash → animation-floor + data-readiness gate | ✅ Done |
-| 7 | No auth/identity → Google One-Tap | ⬜ |
+| 7 | No auth/identity → Google Auth (popup/redirect, One-Tap removed) | ✅ Done |
 
 ## V2 Features
 
 | # | Feature | Status |
 |---|---|---|
 | 1 | Landing page (`/` → `/app`) | ⬜ |
-| 2 | Google Auth + onboarding | ⬜ |
+| 2 | Google Auth + onboarding | ✅ Done |
 | 3 | Saved Pandals | ⬜ |
 | 4 | Visited History | ⬜ |
 | 5 | Full GA event tracking | ⬜ |
@@ -35,7 +35,7 @@ Step 2  ✅ Fix API key exposure
 Step 3  ✅ Fix unstable_cache → React.cache() + ISR
 Step 4  ✅ Split pujo-map.tsx monolith
 Step 5  ⬜ Landing Page
-Step 6  ⬜ Google Auth
+Step 6  ✅ Google Auth (popup desktop / redirect mobile, persistence, hydration guard)
 Step 7  ⬜ Saved Pandals
 Step 8  ⬜ Visited History
 Step 9  ✅ GA event tracking (analytics.ts wired into 5 components)

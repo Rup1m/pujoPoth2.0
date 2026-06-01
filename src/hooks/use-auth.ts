@@ -8,6 +8,9 @@ import {
   signInWithRedirect,
   getRedirectResult,
   signOut as firebaseSignOut,
+  setPersistence,
+  indexedDBLocalPersistence,
+  browserLocalPersistence,
   type User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-config";
@@ -38,59 +41,101 @@ function isMobile(): boolean {
   return false;
 }
 
+/** Sync localStorage cache — best-effort, never throws. */
+function cacheUid(firebaseUser: User | null) {
+  try {
+    if (firebaseUser) {
+      localStorage.setItem(LS_KEY, firebaseUser.uid);
+    } else {
+      localStorage.removeItem(LS_KEY);
+    }
+  } catch {
+    // localStorage may be unavailable in private browsing — non-fatal
+  }
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
   const mountedRef = useRef(true);
+  const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
 
-  // ── Auth state listener + redirect result handler ─────────────────────────
-  // Combined into one effect to guarantee onAuthStateChanged is attached
-  // BEFORE getRedirectResult resolves. This prevents a race on mobile where
-  // the redirect result could resolve before the listener is attached.
+  // ── Sequenced auth initialization ─────────────────────────────────────────
+  //
+  // CRITICAL ORDER OF OPERATIONS:
+  //   1. Set persistence            (await — must complete first)
+  //   2. Process redirect result     (await — must complete before listener)
+  //   3. Attach onAuthStateChanged   (listener fires with FINAL auth state)
+  //
+  // This ordering guarantees that when onAuthStateChanged fires its first
+  // callback, the redirect result (if any) has ALREADY been processed.
+  // Without this, onAuthStateChanged fires immediately with `null`,
+  // page.tsx sees loading=false + user=null, renders the landing page,
+  // and the user is stuck — even though getRedirectResult would eventually
+  // resolve with a valid user.
+  //
   useEffect(() => {
+    let cancelled = false;
     const authInstance = auth();
 
-    const unsubscribe = onAuthStateChanged(authInstance, (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
-
-      if (firebaseUser) {
+    const initAuth = async () => {
+      // 1. Set persistence before any auth operations
+      try {
+        await setPersistence(authInstance, indexedDBLocalPersistence);
+      } catch {
         try {
-          localStorage.setItem(LS_KEY, firebaseUser.uid);
+          await setPersistence(authInstance, browserLocalPersistence);
         } catch {
-          // localStorage may be unavailable in private browsing — non-fatal
-        }
-      } else {
-        try {
-          localStorage.removeItem(LS_KEY);
-        } catch {
-          // same guard
+          // Both failed — continue with Firebase's default persistence.
+          // Auth still works; sessions just may not survive tab closure.
         }
       }
-    });
 
-    // Process any pending redirect result (mobile sign-in flow).
-    // onAuthStateChanged above will automatically pick up the user —
-    // this call just ensures Firebase processes the redirect URL params.
-    getRedirectResult(authInstance)
-      .then((result) => {
+      if (cancelled) return;
+
+      // 2. Process any pending redirect result FIRST.
+      //    This resolves almost instantly (~10ms) when there's no pending
+      //    redirect, so it does NOT add latency for non-redirect visitors.
+      //    For redirect returns, this is the step that exchanges the Google
+      //    auth code for Firebase credentials and writes the session.
+      try {
+        const result = await getRedirectResult(authInstance);
         if (result?.user) {
           console.log("[useAuth] Redirect sign-in succeeded");
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         const code = (err as { code?: string })?.code ?? "";
         if (!SILENT_ERROR_CODES.has(code)) {
           console.error("[useAuth] Redirect sign-in failed:", code, err);
         }
-      });
+      }
 
-    return unsubscribe;
+      if (cancelled) return;
+
+      // 3. NOW attach the auth state listener.
+      //    At this point, if a redirect was processed above, the auth state
+      //    already includes the authenticated user. The first callback will
+      //    fire with the correct user — never with a premature `null`.
+      unsubRef.current = onAuthStateChanged(authInstance, (firebaseUser) => {
+        if (cancelled) return;
+        setUser(firebaseUser);
+        setLoading(false);
+        cacheUid(firebaseUser);
+      });
+    };
+
+    initAuth();
+
+    return () => {
+      cancelled = true;
+      unsubRef.current?.();
+    };
   }, []);
 
   const signIn = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
