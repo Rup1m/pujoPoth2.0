@@ -109,7 +109,34 @@ export function useLocation(): UseLocationReturn {
           data: newLocation,
           timestamp: Date.now(),
         };
-        requestInFlightRef.current = false;
+
+        // If accuracy is poor (>200m), silently retry with high accuracy
+        if (position.coords.accuracy > 200) {
+          navigator.geolocation.getCurrentPosition(
+            (highAccPos) => {
+              if (highAccPos.coords.accuracy < position.coords.accuracy) {
+                const improvedLocation: LatLng = {
+                  lat: highAccPos.coords.latitude,
+                  lng: highAccPos.coords.longitude,
+                };
+                setLocation(improvedLocation);
+                setMapCenter(improvedLocation);
+                locationCacheRef.current = {
+                  data: improvedLocation,
+                  timestamp: Date.now(),
+                };
+              }
+              requestInFlightRef.current = false;
+            },
+            () => {
+              // Silent fail — keep the low-accuracy result
+              requestInFlightRef.current = false;
+            },
+            { enableHighAccuracy: true, timeout: 12_000, maximumAge: 0 }
+          );
+        } else {
+          requestInFlightRef.current = false;
+        }
       },
       (err) => {
         let description = text.locationErrorUnknown;

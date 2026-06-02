@@ -116,7 +116,12 @@ export function PandalHub({
                   variant="ghost"
                   size="icon"
                   onClick={() => {
+                    const isCurrentlyVisited = visitedIds.has(pandal.id);
                     onToggleVisited(pandal);
+                    toast({
+                      title: isCurrentlyVisited ? "Removed from visited" : "Marked as visited ✓",
+                      description: isCurrentlyVisited ? undefined : pandal.name,
+                    });
                   }}
                   className="h-11 w-11 rounded-full"
                 >
@@ -134,13 +139,13 @@ export function PandalHub({
                 </Button>
               </div>
               
-              <div className="mt-2.5">
+              <div className="mt-2.5 min-h-[52px] flex items-center justify-center">
                 {isFetchingDirections ? (
                   <div className="flex items-center justify-center text-muted-foreground p-1 text-xs">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {text.calculating}
                   </div>
                 ) : directions && (directions.driving || directions.walking || directions.transit) ? (
-                  <div className="grid grid-cols-3 gap-2 text-center py-1">
+                  <div className="grid grid-cols-3 gap-2 text-center py-1 w-full">
                     <TravelModeDisplay icon={Car} time={directions.driving} label="Car" />
                     <TravelModeDisplay icon={Footprints} time={directions.walking} label="Walking" />
                     <TravelModeDisplay icon={TramFront} time={directions.transit} label="Train" />

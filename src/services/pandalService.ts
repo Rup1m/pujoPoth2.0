@@ -54,8 +54,12 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
             console.warn('[pandalService] Metro collection unavailable:', metroError);
         }
 
+        // Filter out metro entries from pandals to avoid duplicates —
+        // the Metro collection is the source of truth for metro stations.
+        const filteredPandalList = pandalList.filter(p => p.type !== 'metro');
+
         // Combine pandals and metros into one list for the app to use
-        return [...pandalList, ...metroList];
+        return [...filteredPandalList, ...metroList];
 
     } catch (error) {
         console.error('[pandalService] Firestore fetch failed:', error);

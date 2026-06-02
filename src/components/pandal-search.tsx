@@ -26,6 +26,7 @@ export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { 
   const [totalMatches, setTotalMatches] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const suggestionsListRef = useRef<HTMLUListElement>(null);
@@ -209,7 +210,11 @@ export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { 
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => {
+            setIsFocused(true);
             if (query) setShowSuggestions(true);
+          }}
+          onBlur={() => {
+            setTimeout(() => setIsFocused(false), 150);
           }}
           aria-label="Search pandals"
           aria-autocomplete="list"
@@ -227,12 +232,36 @@ export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { 
         )}
       </div>
 
-      {showSuggestions && (
+      {(showSuggestions || (isFocused && query.length === 0)) && (
         <div
           className="absolute top-full mt-2 w-full bg-background rounded-2xl shadow-lg overflow-hidden border border-border/50 animate-fade-in"
           role="listbox"
         >
-          {isLoading ? (
+          {isFocused && query.length === 0 ? (
+            /* Popular pandals shown when focused with empty query */
+            (() => {
+              const popularPandals = pandals.filter(p => p.type === 'popular').slice(0, 5);
+              return popularPandals.length > 0 ? (
+                <>
+                  <p className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Popular Pandals</p>
+                  <ul className="py-1 max-h-60 overflow-y-auto" role="listbox">
+                    {popularPandals.map((pandal) => (
+                      <li
+                        key={pandal.id}
+                        onClick={() => handleSelect(pandal)}
+                        role="option"
+                        aria-selected={false}
+                        className="px-4 py-3 cursor-pointer transition-colors text-base hover:bg-muted text-foreground"
+                      >
+                        {displayName(pandal)}
+                        <span className="ml-2 text-xs text-primary font-semibold">★</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : null;
+            })()
+          ) : isLoading ? (
             <div className="p-4 flex items-center justify-center text-muted-foreground">
               <Loader2 className="mr-2 h-5 w-5 animate-spin" /> {text.searching}
             </div>

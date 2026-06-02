@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo } from 'react';
 import { Filter, X, TramFront } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -68,14 +68,8 @@ function countActiveFilters(filters: Filters): number {
 }
 
 function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
-  const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [filters, setFilters] = useState<Filters>(() => getSavedFilters());
   const [isOpen, setIsOpen] = useState(false);
-
-  // Load saved filters on mount
-  useEffect(() => {
-    const saved = getSavedFilters();
-    setFilters(saved);
-  }, []);
 
   const applyFilters = (newFilters: Filters) => {
     setFilters(newFilters);

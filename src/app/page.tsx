@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
@@ -48,6 +49,8 @@ function LandingPageContent() {
   // ── Unauthenticated — landing page ─────────────────────────────────────────
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Prefetch /app JS bundle while user reads the landing page */}
+      <Link href="/app" prefetch={true} className="sr-only" aria-hidden="true">Preload app</Link>
       {/* ─── Hero Section ─── */}
       <section className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-10 text-center">
         {/* Brand */}
