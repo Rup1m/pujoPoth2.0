@@ -340,6 +340,8 @@ export default function PujoMap({
   const [isClient, setIsClient] = useState(false);
   const [animComplete, setAnimComplete] = useState(false);
   const [langSelected, setLangSelected] = useState(false);
+  const [minLoadingElapsed, setMinLoadingElapsed] = useState(false);
+  const minLoadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { text } = useLanguage();
   const { location, mapCenter, status, locationDenied, getLocation } = useLocation();
 
@@ -366,8 +368,19 @@ export default function PujoMap({
   // Trigger GPS once language is confirmed
   useEffect(() => {
     if (isClient && langSelected && status === "idle") {
+      // Start a minimum loading floor timer so the loading screen
+      // doesn't flash for <100ms when GPS is instantly denied
+      setMinLoadingElapsed(false);
+      minLoadingTimerRef.current = setTimeout(() => {
+        setMinLoadingElapsed(true);
+      }, 500);
       getLocation();
     }
+    return () => {
+      if (minLoadingTimerRef.current) {
+        clearTimeout(minLoadingTimerRef.current);
+      }
+    };
   }, [isClient, langSelected, status, getLocation]);
 
   // ── Onboarding gates ──────────────────────────────────────────────────────
@@ -401,7 +414,11 @@ export default function PujoMap({
     );
   }
 
-  if (status === "loading") {
+  // Show loading screen while GPS is working OR if the minimum display time hasn't elapsed yet.
+  // This prevents a jarring <100ms flash when GPS is instantly denied/unavailable.
+  const showLoading = status === "loading" || (status === "success" && !minLoadingElapsed);
+
+  if (showLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-4">
         <CardioLoadingAnimation />

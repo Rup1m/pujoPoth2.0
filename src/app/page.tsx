@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
+import { siteStats } from "@/lib/site-config";
 
 /**
  * Wrapper that provides the Suspense boundary required by useSearchParams()
@@ -94,21 +95,21 @@ function LandingPageContent() {
       <section className="px-6 py-8">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <p className="text-2xl font-extrabold text-primary">1,080+</p>
+            <p className="text-2xl font-extrabold text-primary">{siteStats.explorers.value}</p>
             <p className="text-xs text-muted-foreground mt-1 leading-snug">
-              Puja explorers last season
+              {siteStats.explorers.label}
             </p>
           </div>
           <div>
-            <p className="text-2xl font-extrabold text-primary">95+</p>
+            <p className="text-2xl font-extrabold text-primary">{siteStats.pandals.value}</p>
             <p className="text-xs text-muted-foreground mt-1 leading-snug">
-              Pandals &amp; Bonedi Bari Pujos
+              {siteStats.pandals.label}
             </p>
           </div>
           <div>
-            <p className="text-2xl font-extrabold text-primary">70K</p>
+            <p className="text-2xl font-extrabold text-primary">{siteStats.instagramViews.value}</p>
             <p className="text-xs text-muted-foreground mt-1 leading-snug">
-              Instagram video views
+              {siteStats.instagramViews.label}
             </p>
           </div>
         </div>
