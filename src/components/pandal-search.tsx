@@ -198,7 +198,7 @@ export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { 
 
   return (
     <div ref={searchContainerRef} className="absolute top-4 left-4 w-[90%] max-w-sm z-20">
-      <div className="relative">
+      <div className={`relative transition-all duration-200 ease-out rounded-full ${isFocused ? 'shadow-lg ring-1 ring-orange-400/40 scale-[1.01]' : ''}`}>
         <div className="absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center pointer-events-none">
           <MapPin className="h-6 w-6 text-primary/80" />
         </div>
@@ -245,13 +245,14 @@ export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { 
                 <>
                   <p className="px-4 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Popular Pandals</p>
                   <ul className="py-1 max-h-60 overflow-y-auto" role="listbox">
-                    {popularPandals.map((pandal) => (
+                    {popularPandals.map((pandal, index) => (
                       <li
                         key={pandal.id}
                         onClick={() => handleSelect(pandal)}
                         role="option"
                         aria-selected={false}
-                        className="px-4 py-3 cursor-pointer transition-colors text-base hover:bg-muted text-foreground"
+                        className="px-4 py-3 cursor-pointer text-base text-foreground transition-colors duration-150 hover:bg-orange-50 dark:hover:bg-orange-950/20 active:bg-orange-100 dark:active:bg-orange-900/30"
+                        style={{ animation: `slideInItem 180ms ease forwards`, animationDelay: `${index * 30}ms`, opacity: 0 }}
                       >
                         {displayName(pandal)}
                         <span className="ml-2 text-xs text-primary font-semibold">★</span>
@@ -278,11 +279,12 @@ export const PandalSearch = memo(function PandalSearch({ pandals, onSelect }: { 
                     onClick={() => handleSelect(pandal)}
                     role="option"
                     aria-selected={index === selectedIndex}
-                    className={`px-4 py-3 cursor-pointer transition-colors text-base ${
+                    className={`px-4 py-3 cursor-pointer text-base transition-colors duration-150 ${
                       index === selectedIndex
                         ? "bg-primary/20 text-foreground font-semibold"
-                        : "hover:bg-muted text-foreground"
+                        : "text-foreground hover:bg-orange-50 dark:hover:bg-orange-950/20 active:bg-orange-100 dark:active:bg-orange-900/30"
                     }`}
+                    style={{ animation: `slideInItem 180ms ease forwards`, animationDelay: `${index * 30}ms`, opacity: 0 }}
                   >
                     {displayName(pandal)}
                     {pandal.type === "popular" && (

@@ -79,18 +79,18 @@ function LandingPageContent() {
       {/* ─── Hero Section ─── */}
       <section className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-10 text-center">
         {/* Brand */}
-        <h1 className="text-5xl leading-tight mb-4">
+        <h1 className="text-5xl leading-tight mb-4" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '0ms' }}>
           <span className="font-calligraphy">Pujo</span>
           <span className="font-extrabold">পথ</span>
         </h1>
 
         {/* Tagline */}
-        <p className="text-lg font-bold text-accent mb-2">
+        <p className="text-lg font-bold text-accent mb-2" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '80ms' }}>
           Kolkata&apos;s smartest pandal guide
         </p>
 
         {/* Subtext */}
-        <p className="text-sm text-muted-foreground max-w-xs mb-8 leading-relaxed">
+        <p className="text-sm text-muted-foreground max-w-xs mb-8 leading-relaxed" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '80ms' }}>
           95+ pandals. Real-time directions. Works right from your phone.
         </p>
 
@@ -99,6 +99,7 @@ function LandingPageContent() {
           href={href}
           onClick={handleClick}
           className="flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all duration-200 hover:bg-primary/90 active:scale-95 hover:shadow-lg hover:shadow-primary/25"
+          style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '240ms' }}
         >
           <MapPin className="w-5 h-5" />
           <span>Start Exploring</span>
@@ -107,7 +108,7 @@ function LandingPageContent() {
       </section>
 
       {/* ─── Social Proof ─── */}
-      <section className="px-6 py-8">
+      <section className="px-6 py-8" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '160ms' }}>
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
             <p className="text-2xl font-extrabold text-primary">{siteStats.explorers.value}</p>
@@ -131,10 +132,10 @@ function LandingPageContent() {
       </section>
 
       {/* ─── Divider ─── */}
-      <div className="mx-6 border-t border-border" />
+      <div className="mx-6 border-t border-border" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '320ms' }} />
 
       {/* ─── Feature Highlights ─── */}
-      <section className="px-6 py-8 flex flex-col gap-4">
+      <section className="px-6 py-8 flex flex-col gap-4" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '320ms' }}>
         <div className="rounded-lg border border-border bg-card p-5">
           <h3 className="font-bold text-base text-accent mb-1">
             Find Pandals Near You
@@ -164,7 +165,7 @@ function LandingPageContent() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="px-6 py-8 text-center text-xs text-muted-foreground border-t border-border mt-auto">
+      <footer className="px-6 py-8 text-center text-xs text-muted-foreground border-t border-border mt-auto" style={{ animation: 'fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '320ms' }}>
         <p className="font-bold">A Rupam Banerjee Production</p>
         <p className="mt-1">rupamiem@gmail.com</p>
         <p className="mt-1">&copy; 2026</p>

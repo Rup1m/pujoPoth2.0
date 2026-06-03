@@ -4,8 +4,6 @@
 import { useState, memo } from 'react';
 import { Filter, X, TramFront } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from '@/components/ui/sheet';
 import { trackEvent } from '@/lib/analytics';
 
@@ -133,19 +131,24 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
   const activeFilterCount = countActiveFilters(filters);
   const hasActiveFilters = activeFilterCount > 0;
 
-  const FilterCheckbox = ({ id, label }: { id: keyof Filters; label: string }) => (
-    <div className="flex items-center space-x-3 py-3">
-      <Checkbox
-        id={id}
-        checked={filters[id]}
-        onCheckedChange={() => handleCheckboxChange(id)}
-        className="h-6 w-6"
-      />
-      <Label htmlFor={id} className="text-lg font-medium text-foreground cursor-pointer">
+  const FilterPill = ({ id, label, icon: Icon }: { id: keyof Filters; label: string; icon?: React.ElementType }) => {
+    const isActive = filters[id];
+    return (
+      <button
+        type="button"
+        onClick={() => handleCheckboxChange(id)}
+        className={`flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 active:scale-95 ${
+          isActive 
+            ? 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300' 
+            : 'bg-muted/40 text-muted-foreground hover:bg-muted/70'
+        }`}
+        style={isActive ? { boxShadow: 'inset 0 0 0 1.5px rgba(251,146,60,0.6), 0 2px 8px rgba(251,146,60,0.2)' } : {}}
+      >
+        {Icon && <Icon className="h-4 w-4" />}
         {label}
-      </Label>
-    </div>
-  );
+      </button>
+    );
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -153,7 +156,7 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
         <Button 
           variant="outline" 
           size="icon" 
-          className="bg-background/80 backdrop-blur-sm shadow-lg h-12 w-12 rounded-full border border-foreground/20 relative"
+          className="bg-background/80 backdrop-blur-sm shadow-lg h-12 w-12 rounded-full border border-foreground/20 relative transition-all duration-150 active:scale-95"
           aria-label={`Filter pandals${hasActiveFilters ? ` (${activeFilterCount} active)` : ''}`}
         >
           <Filter className="h-5 w-5 text-primary" />
@@ -171,7 +174,7 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
           </span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-2xl">
+      <SheetContent side="bottom" className="rounded-t-2xl transition-all duration-250 ease-out">
         <SheetHeader className="mb-4 text-center">
           <SheetTitle className="text-2xl font-bold">
             Filter Pandals
@@ -183,37 +186,24 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
           </SheetTitle>
         </SheetHeader>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-4">
+        <div className="grid grid-cols-2 gap-3 px-4">
           {/* Zone Filters */}
-          <fieldset>
-            <legend className="sr-only">Filter by zone</legend>
-            <FilterCheckbox id="north" label="North Kolkata" />
-            <FilterCheckbox id="south" label="South Kolkata" />
-            <FilterCheckbox id="central" label="Central Kolkata" />
-          </fieldset>
+          <FilterPill id="north" label="North Kolkata" />
+          <FilterPill id="south" label="South Kolkata" />
+          <FilterPill id="central" label="Central Kolkata" />
 
           {/* Bonedi Filter */}
-          <FilterCheckbox id="bonedi" label="Bonedi Bari" />
+          <FilterPill id="bonedi" label="Bonedi Bari" />
 
           <div className="col-span-2 border-t -mx-4 my-2"></div>
 
           {/* Metro Filter (Exclusive) */}
-          <div className="col-span-2 flex items-center justify-center">
-            <div className="flex items-center space-x-3 py-1">
-              <Checkbox
-                id="metro"
-                checked={filters.metro}
-                onCheckedChange={() => handleCheckboxChange("metro")}
-                className="h-6 w-6"
-              />
-              <Label htmlFor="metro" className="text-lg font-medium text-foreground cursor-pointer flex items-center gap-2">
-                <TramFront className="h-5 w-5" /> Nearest Metro
-              </Label>
-            </div>
+          <div className="col-span-2">
+            <FilterPill id="metro" label="Nearest Metro" icon={TramFront} />
           </div>
 
           {/* Info text */}
-          <p className="col-span-2 text-xs text-muted-foreground text-center mt-2 px-1">
+          <p className="col-span-2 text-xs text-muted-foreground text-center mt-1 px-1">
             Zone filters are mutually exclusive. Metro overrides all other filters.
           </p>
         </div>

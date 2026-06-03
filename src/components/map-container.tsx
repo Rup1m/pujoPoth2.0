@@ -18,8 +18,8 @@
 
 "use client";
 
-import { useState, useCallback, memo } from "react";
-import { Map, AdvancedMarker } from "@vis.gl/react-google-maps";
+import { useState, useCallback, memo, useEffect } from "react";
+import { Map, AdvancedMarker, useMap } from "@vis.gl/react-google-maps";
 import type { Pandal } from "@/lib/types";
 import { PandalMarker } from "@/components/pandal-marker";
 import { ClusterMarker } from "@/components/cluster-marker";
@@ -40,6 +40,8 @@ const MAP_STYLES: google.maps.MapTypeStyle[] = [
     stylers: [{ visibility: "off" }],
   },
 ];
+
+const SHEET_PAN_OFFSET_PX = 120;
 
 export interface MapContainerProps {
   location: LatLng | null;
@@ -66,6 +68,17 @@ export const MapContainer = memo(function MapContainer({
   onPandalSelect,
 }: MapContainerProps) {
   const [zoom, setZoom] = useState<number | null>(14);
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !selectedPandalId) return;
+
+    const selectedPandal = pandals.find((p) => p.id === selectedPandalId);
+    if (selectedPandal) {
+      map.panTo({ lat: selectedPandal.latitude, lng: selectedPandal.longitude });
+      map.panBy(0, -SHEET_PAN_OFFSET_PX);
+    }
+  }, [map, selectedPandalId, pandals]);
 
   // Track zoom via onZoomChanged — only fires when zoom changes, not on every pan.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

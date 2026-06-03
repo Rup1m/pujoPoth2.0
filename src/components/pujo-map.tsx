@@ -52,11 +52,7 @@ const PandalHub = dynamic(
   () => import("@/components/pandal-hub").then((m) => m.PandalHub),
   {
     ssr: false,
-    loading: () => (
-      <div className="absolute bottom-4 right-4 z-20">
-        <Skeleton className="h-48 w-full max-w-sm" />
-      </div>
-    ),
+    loading: () => null,
   }
 );
 
@@ -314,19 +310,17 @@ function MapCore({ location, locationDenied, locationPillState, initialPandals, 
       />
 
       {/* Detail sheet — lazy loaded */}
-      {selectedPandal && (
-        <PandalHub
-          pandal={selectedPandal}
-          location={location}
-          directions={directions}
-          isFetchingDirections={isFetchingDirections}
-          suggestions={suggestedPandals}
-          onSuggestionSelect={handlePandalSelect}
-          onClose={handlePandalDeselect}
-          onToggleVisited={toggleVisited}
-          visitedIds={visitedIds}
-        />
-      )}
+      <PandalHub
+        pandal={selectedPandal}
+        location={location}
+        directions={directions}
+        isFetchingDirections={isFetchingDirections}
+        suggestions={suggestedPandals}
+        onSuggestionSelect={handlePandalSelect}
+        onClose={handlePandalDeselect}
+        onToggleVisited={toggleVisited}
+        visitedIds={visitedIds}
+      />
 
       {/* Floating action buttons */}
       <MapControls

@@ -3,7 +3,7 @@
 
 import type { Pandal } from "@/lib/types";
 import { memo } from "react";
-import { TramFront, Check } from "lucide-react";
+import { TramFront } from "lucide-react";
 
 interface PandalMarkerProps {
   isSelected: boolean;
@@ -47,6 +47,7 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
 
   const size = 36;
   const baseColor = isBonedi ? "hsl(var(--destructive))" : "hsl(var(--primary))";
+  const showVisited = isVisited && !isSelected;
   
   return (
     <div
@@ -63,18 +64,16 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
       {isSelected && (
         <div className="absolute inset-0 bg-primary/50 rounded-full animate-pulse will-change-transform" style={{ transform: "translateZ(0)" }} />
       )}
-      {isVisited && (
-        <div
-          className="absolute top-0 right-0 z-20 h-5 w-5 rounded-full bg-emerald-500 border-2 border-background flex items-center justify-center"
-        >
-          <Check className="h-3 w-3 text-white stroke-[3]" />
+      {showVisited && (
+        <div className="absolute -bottom-1 -right-1 z-20 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+          <span className="text-white text-[8px] font-bold">✓</span>
         </div>
       )}
       <svg
         viewBox="0 0 48 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-lg"
+        className={`w-full h-full drop-shadow-lg transition-opacity duration-300 ${showVisited ? 'opacity-45' : 'opacity-100'}`}
       >
         <defs>
           <filter id={shadowId} x="-50%" y="-50%" width="200%" height="200%">
