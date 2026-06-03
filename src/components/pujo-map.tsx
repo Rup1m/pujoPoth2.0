@@ -3,10 +3,14 @@
  *
  * This file owns ONLY the composition of the app:
  *  - API provider setup
- *  - Onboarding gate (splash → language selection → GPS)
+ *  - Onboarding gate (splash → language selection)
  *  - Pandal selection + filter state
  *  - Wiring hooks (useLocation, useDirections) to child components
  *  - Passing the useMap instance down for imperative pan/zoom
+ *
+ * KEY FIX: The map is NEVER blocked behind GPS location. The map
+ * renders immediately with Kolkata center, and GPS updates the
+ * location dot asynchronously — matching how Google Maps works.
  *
  * Extracted modules:
  *  - GPS logic      → src/hooks/use-location.ts
@@ -23,7 +27,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import { useState, useEffect, useCallback, useRef, memo, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, MapPin, Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -56,43 +60,59 @@ const PandalHub = dynamic(
   }
 );
 
-// ── Loading animation ─────────────────────────────────────────────────────────
+// ── Non-blocking Location Pill ───────────────────────────────────────────────
 
-const CardioLoadingAnimation = () => (
-  <div className="w-48 h-32 flex items-center justify-center">
-    <svg
-      className="w-[100px] h-auto text-foreground"
-      viewBox="0 0 50 31.25"
-      preserveAspectRatio="xMidYMid"
+type LocationPillState = "locating" | "located" | "denied" | "hidden";
+
+function LocationPill({ state }: { state: LocationPillState }) {
+  if (state === "hidden") return null;
+
+  return (
+    <div
+      className={`
+        absolute top-3 left-1/2 -translate-x-1/2 z-20
+        flex items-center gap-2 px-4 py-2
+        rounded-full backdrop-blur-md border shadow-lg
+        transition-all duration-500 ease-out
+        ${state === "denied"
+          ? "bg-amber-50/90 border-amber-300/60 text-amber-800"
+          : state === "located"
+            ? "bg-emerald-50/90 border-emerald-300/60 text-emerald-800"
+            : "bg-background/90 border-border/60 text-foreground"
+        }
+        animate-fade-in-up
+      `}
     >
-      <path
-        className="opacity-20"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="none"
-        pathLength="100"
-        d="M0.625 21.5 h10.25 l3.75 -5.875 l7.375 15 l9.75 -30 l7.375 20.875 v0 h10.25"
-      />
-      <path
-        className="animate-travel-fade"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="none"
-        strokeDasharray="100"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        pathLength="100"
-        d="M0.625 21.5 h10.25 l3.75 -5.875 l7.375 15 l9.75 -30 l7.375 20.875 v0 h10.25"
-      />
-    </svg>
-  </div>
-);
+      {state === "locating" && (
+        <>
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+          <span className="text-xs font-semibold">Locating you...</span>
+        </>
+      )}
+      {state === "located" && (
+        <>
+          <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 flex items-center justify-center">
+            <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+          </div>
+          <span className="text-xs font-semibold">Location found</span>
+        </>
+      )}
+      {state === "denied" && (
+        <>
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+          <span className="text-xs font-semibold">Location unavailable — showing Kolkata</span>
+        </>
+      )}
+    </div>
+  );
+}
 
 // ── MapCore — inner component that has access to the useMap() hook ─────────────
 
 interface MapCoreProps {
   location: { lat: number; lng: number } | null;
   locationDenied: boolean;
+  locationPillState: LocationPillState;
   initialPandals: Pandal[];
   initialCenter: { lat: number; lng: number };
   initialSelectedPandalId?: string;
@@ -103,7 +123,7 @@ interface MapCoreProps {
  * It orchestrates pandal selection, suggestion calculation, filtering,
  * and imperative map navigation — delegating all rendering to focused children.
  */
-function MapCore({ location, locationDenied, initialPandals, initialCenter, initialSelectedPandalId }: MapCoreProps) {
+function MapCore({ location, locationDenied, locationPillState, initialPandals, initialCenter, initialSelectedPandalId }: MapCoreProps) {
   const mapInstance = useMap();
   const { text } = useLanguage();
   const { toast } = useToast();
@@ -220,6 +240,16 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
     }
   }, [initialSelectedPandalId, initialPandals, handlePandalSelect, mapInstance]);
 
+  // ── Pan to user location when GPS resolves (one-time) ─────────────────────
+
+  const hasPannedToLocationRef = useRef(false);
+  useEffect(() => {
+    if (location && mapInstance && !hasPannedToLocationRef.current && !initialSelectedPandalId) {
+      hasPannedToLocationRef.current = true;
+      mapInstance.panTo(location);
+    }
+  }, [location, mapInstance, initialSelectedPandalId]);
+
   // ── Recenter handler ──────────────────────────────────────────────────────
 
   const handleRecenter = useCallback(() => {
@@ -267,6 +297,9 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
 
   return (
     <>
+      {/* Non-blocking location pill */}
+      <LocationPill state={locationPillState} />
+
       {/* Search bar */}
       <PandalSearch pandals={initialPandals} onSelect={handlePandalSelect} />
 
@@ -302,6 +335,7 @@ function MapCore({ location, locationDenied, initialPandals, initialCenter, init
         isAboutOpen={isAboutOpen}
         onAboutOpenChange={setIsAboutOpen}
       />
+
       {/* Location denied banner */}
       {locationDenied && (
         <div className="absolute top-[72px] left-4 right-4 z-10 flex items-center gap-2 bg-background/90 backdrop-blur-sm border border-amber-400/50 rounded-xl px-4 py-2">
@@ -340,10 +374,40 @@ export default function PujoMap({
   const [isClient, setIsClient] = useState(false);
   const [animComplete, setAnimComplete] = useState(false);
   const [langSelected, setLangSelected] = useState(false);
-  const [minLoadingElapsed, setMinLoadingElapsed] = useState(false);
-  const minLoadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { text } = useLanguage();
   const { location, mapCenter, status, locationDenied, getLocation } = useLocation();
+
+  // ── Location pill state machine ────────────────────────────────────────────
+  const [locationPillState, setLocationPillState] = useState<LocationPillState>("hidden");
+  const pillDismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Track location status transitions for the pill
+  useEffect(() => {
+    if (status === "loading") {
+      setLocationPillState("locating");
+    } else if (status === "success" && locationDenied) {
+      setLocationPillState("denied");
+      // Auto-dismiss after 4s
+      pillDismissTimerRef.current = setTimeout(() => {
+        setLocationPillState("hidden");
+      }, 4000);
+    } else if (status === "success" && location) {
+      setLocationPillState("located");
+      // Auto-dismiss after 2s
+      pillDismissTimerRef.current = setTimeout(() => {
+        setLocationPillState("hidden");
+      }, 2000);
+    } else if (status === "success") {
+      // Success but no location (denied without explicit denial flag)
+      setLocationPillState("hidden");
+    }
+
+    return () => {
+      if (pillDismissTimerRef.current) {
+        clearTimeout(pillDismissTimerRef.current);
+      }
+    };
+  }, [status, locationDenied, location]);
 
   // ── Client-side initialisation ────────────────────────────────────────────
   const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -365,22 +429,12 @@ export default function PujoMap({
     setAnimComplete(true);
   }, []);
 
-  // Trigger GPS once language is confirmed
+  // Trigger GPS once language is confirmed — fire and forget,
+  // the map renders immediately regardless of GPS outcome
   useEffect(() => {
     if (isClient && langSelected && status === "idle") {
-      // Start a minimum loading floor timer so the loading screen
-      // doesn't flash for <100ms when GPS is instantly denied
-      setMinLoadingElapsed(false);
-      minLoadingTimerRef.current = setTimeout(() => {
-        setMinLoadingElapsed(true);
-      }, 500);
       getLocation();
     }
-    return () => {
-      if (minLoadingTimerRef.current) {
-        clearTimeout(minLoadingTimerRef.current);
-      }
-    };
   }, [isClient, langSelected, status, getLocation]);
 
   // ── Onboarding gates ──────────────────────────────────────────────────────
@@ -414,22 +468,9 @@ export default function PujoMap({
     );
   }
 
-  // Show loading screen while GPS is working OR if the minimum display time hasn't elapsed yet.
-  // This prevents a jarring <100ms flash when GPS is instantly denied/unavailable.
-  const showLoading = status === "loading" || (status === "success" && !minLoadingElapsed);
-
-  if (showLoading) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-4">
-        <CardioLoadingAnimation />
-        <p className="text-lg font-semibold text-foreground animate-pulse">
-          {text.findingLocation}
-        </p>
-      </div>
-    );
-  }
-
-  // ── Map ───────────────────────────────────────────────────────────────────
+  // ── Map — renders IMMEDIATELY, no location gate ───────────────────────────
+  // GPS location updates the blue dot and pans the map asynchronously.
+  // This matches how Google Maps itself works — map first, blue dot later.
 
   return (
     <div className="h-full w-full relative">
@@ -440,6 +481,7 @@ export default function PujoMap({
         <DynamicMapCore
           location={location}
           locationDenied={locationDenied}
+          locationPillState={locationPillState}
           initialPandals={initialPandals}
           initialCenter={mapCenter}
           initialSelectedPandalId={initialSelectedPandalId}

@@ -130,7 +130,12 @@ export default {
         'road-flow': {
             from: { strokeDashoffset: '0' },
             to: { strokeDashoffset: '20' },
-        }
+        },
+        'loading-bar': {
+            '0%': { width: '0%', marginLeft: '0%' },
+            '50%': { width: '70%', marginLeft: '15%' },
+            '100%': { width: '0%', marginLeft: '100%' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',

@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin, ArrowRight } from "lucide-react";
 import { siteStats } from "@/lib/site-config";
 
 /**
@@ -26,32 +26,56 @@ export default function LandingPage() {
 }
 
 function LandingPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const handleExplore = () => {
-    // Prevent multiple clicks
-    if (isLoading) return;
+  const pandal = searchParams.get("pandal");
+  const href = pandal ? `/app?pandal=${pandal}` : "/app";
 
-    setIsLoading(true);
-    const pandal = searchParams.get("pandal");
-    
-    // Use requestAnimationFrame to ensure animation frame is painted
-    requestAnimationFrame(() => {
-      if (pandal) {
-        router.push(`/app?pandal=${pandal}`);
-      } else {
-        router.push("/app");
-      }
-    });
-  };
+  const handleClick = useCallback(() => {
+    setIsNavigating(true);
+  }, []);
 
-  // ── Unauthenticated — landing page ─────────────────────────────────────────
+  // Fallback: if navigation takes too long (>8s), reset state so user can retry
+  useEffect(() => {
+    if (!isNavigating) return;
+    const timer = setTimeout(() => {
+      setIsNavigating(false);
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [isNavigating]);
+
+  // ── Full-screen navigation overlay ──────────────────────────────────────
+  if (isNavigating) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center gap-6 animate-in fade-in duration-200">
+        <h1
+          className="text-5xl font-bold text-primary tracking-tight animate-pulse"
+          style={{
+            textShadow:
+              "0 4px 15px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0,0,0,0.8), -1px -1px 1px rgba(0,0,0,0.5), 1px 1px 1px rgba(0,0,0,0.5)",
+          }}
+        >
+          <span className="font-calligraphy">Pujo</span>
+          <span className="font-extrabold text-6xl">পথ</span>
+        </h1>
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          <span className="text-sm font-medium">Loading your pandal map...</span>
+        </div>
+        <div className="w-48 h-1 bg-muted rounded-full overflow-hidden">
+          <div className="h-full bg-primary rounded-full animate-[loading-bar_2s_ease-in-out_infinite]" />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Landing page ────────────────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Prefetch /app JS bundle while user reads the landing page */}
       <Link href="/app" prefetch={true} className="sr-only" aria-hidden="true">Preload app</Link>
+
       {/* ─── Hero Section ─── */}
       <section className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-10 text-center">
         {/* Brand */}
@@ -70,25 +94,16 @@ function LandingPageContent() {
           95+ pandals. Real-time directions. Works right from your phone.
         </p>
 
-        {/* CTA */}
-        <button
-          onClick={handleExplore}
-          disabled={isLoading}
-          className={`flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all active:scale-95 ${
-            isLoading
-              ? "opacity-80 scale-95 cursor-wait"
-              : "hover:bg-primary/90 active:scale-95"
-          }`}
+        {/* CTA — uses <a> tag for reliable navigation to force-dynamic route */}
+        <a
+          href={href}
+          onClick={handleClick}
+          className="flex items-center justify-center gap-3 w-full max-w-xs rounded-lg bg-primary text-primary-foreground font-bold text-lg py-4 px-6 transition-all duration-200 hover:bg-primary/90 active:scale-95 hover:shadow-lg hover:shadow-primary/25"
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Loading...</span>
-            </>
-          ) : (
-            "Start Exploring"
-          )}
-        </button>
+          <MapPin className="w-5 h-5" />
+          <span>Start Exploring</span>
+          <ArrowRight className="w-5 h-5" />
+        </a>
       </section>
 
       {/* ─── Social Proof ─── */}
