@@ -17,14 +17,17 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
 
   if (pandalType === "metro") {
     const metroColor = "hsl(220 100% 50%)"; // A distinct blue for metro
-    const size = isSelected ? 32 : 24;
+    const size = 24;
     return (
         <div
-            className="relative transition-all duration-300 flex items-center justify-center will-change-transform"
+            className={`relative flex items-center justify-center will-change-transform transition-transform duration-150 ${
+              isSelected 
+                ? "scale-125 -translate-y-1 drop-shadow-lg z-50" 
+                : "hover:scale-110 hover:-translate-y-0.5"
+            }`}
             style={{
                 width: size,
                 height: size,
-                transform: `scale(${isSelected ? 1.1 : 1}) translateZ(0)`,
             }}
         >
             <div 
@@ -42,16 +45,19 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
     );
   }
 
-  const size = isSelected ? 48 : 36;
+  const size = 36;
   const baseColor = isBonedi ? "hsl(var(--destructive))" : "hsl(var(--primary))";
   
   return (
     <div
-      className="relative transition-all duration-300 will-change-transform"
+      className={`relative will-change-transform transition-transform duration-150 animate-marker-pop ${
+        isSelected 
+          ? "scale-125 -translate-y-1 drop-shadow-lg z-50" 
+          : "hover:scale-110 hover:-translate-y-0.5"
+      }`}
       style={{
         width: size,
         height: size,
-        transform: `scale(${isSelected ? 1.1 : 1}) translateZ(0)`,
       }}
     >
       {isSelected && (
