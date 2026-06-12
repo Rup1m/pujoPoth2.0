@@ -10,9 +10,7 @@
 6. Build only what genuinely improves user experience
 7. Robust MVP instead of feature overload
 8. Utility over gimmicks
-
 ---
-
 # 📱 Mobile-First Requirements
 
 9. 100% mobile-centric application
@@ -22,9 +20,7 @@
 13. Must work on low-end devices as well as flagship phones
 14. Touch-first UX everywhere
 15. Lightweight rendering and interactions
-
 ---
-
 # ⚡ Performance Requirements
 
 16. Buttery smooth experience
@@ -41,9 +37,7 @@
 27. No unused code or dead components
 28. No unnecessary libraries or programs
 29. Extremely optimized runtime execution
-
 ---
-
 # 🧱 Stability & Reliability Requirements
 
 30. Zero-error user experience
@@ -56,11 +50,8 @@
 37. Reliable Firestore querying
 38. Production-grade deployment stability
 39. No broken flows or dead ends
-
 ---
-
 # 🎨 UI/UX Requirements
-
 40. Premium-looking interface
 41. Festive + professional design balance
 42. Joyful Durga Puja vibe
@@ -72,11 +63,8 @@
 48. Clear loading states
 49. Clear error states
 50. Delightful but practical UX
-
 ---
-
 # 🗺️ Feature Requirements
-
 51. Nearby pandal discovery
 52. Accurate directions integration
 53. Search with autocomplete
@@ -87,9 +75,7 @@
 58. Metro gate-level navigation
 59. Smart next-pandal suggestions
 60. Bengali + English support
-
 ---
-
 # 🔐 Security & Infrastructure Requirements
 
 61. Best-practice implementation only
@@ -99,9 +85,7 @@
 65. Tamper-proof monitoring
 66. Secure API handling
 67. Remove any unused security/auth systems if not actively needed
-
 ---
-
 # 🧹 Codebase Requirements
 
 68. High-level cleanup of the codebase
@@ -112,9 +96,7 @@
 73. Keep code modular and maintainable
 74. Keep codebase lean and efficient
 75. Ensure every line of code has a purpose
-
 ---
-
 # 🚀 Deployment Requirements
 
 76. Production-ready from launch
