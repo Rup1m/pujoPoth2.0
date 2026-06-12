@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAuth as getFirebaseAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,13 +17,14 @@ const firebaseConfig = {
  * NEXT_PUBLIC_FIREBASE_* env vars are absent, which causes
  * `auth/invalid-api-key` if initialization happens at import time.
  *
- * Consumers call `getDb()` and `getFirebaseAuth()` to obtain the real
+ * Consumers call `getDb()` and `getAuth()` to obtain the real
  * Firebase instances — these are only constructed on first access at
  * request time, never during the static-analysis build phase.
  */
 
 let _app: FirebaseApp | null = null;
 let _db: Firestore | null = null;
+let _auth: Auth | null = null;
 
 function getFirebaseApp(): FirebaseApp {
     if (!_app) {
@@ -39,6 +41,12 @@ function getDb(): Firestore {
     return _db;
 }
 
-export { getDb as db, getFirebaseApp as app };
+/** Auth instance — safe to call at request time. */
+function getAuth(): Auth {
+    if (!_auth) {
+        _auth = getFirebaseAuth(getFirebaseApp());
+    }
+    return _auth;
+}
 
-
+export { getDb as db, getAuth as auth, getFirebaseApp as app };

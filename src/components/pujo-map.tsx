@@ -45,6 +45,8 @@ import { MapContainer } from "@/components/map-container";
 import { MapControls } from "@/components/map-controls";
 import { SplashScreen } from "@/components/splash-screen";
 import { LanguageOnboarding } from "@/components/language-onboarding";
+import { useAuth } from "@/hooks/use-auth";
+import { AuthScreen } from "@/components/auth-screen";
 
 // ── Lazy-loaded heavy components ─────────────────────────────────────────────
 
@@ -370,6 +372,7 @@ export default function PujoMap({
   const [langSelected, setLangSelected] = useState(false);
   const { text } = useLanguage();
   const { location, mapCenter, status, locationDenied, getLocation } = useLocation();
+  const { user, loading: authLoading } = useAuth();
 
   // ── Location pill state machine ────────────────────────────────────────────
   const [locationPillState, setLocationPillState] = useState<LocationPillState>("hidden");
@@ -440,6 +443,19 @@ export default function PujoMap({
     return (
       <LanguageOnboarding onLanguageSelect={() => setLangSelected(true)} />
     );
+  }
+
+  // ── Auth Gate ─────────────────────────────────────────────────────────────
+  if (authLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthScreen />;
   }
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;

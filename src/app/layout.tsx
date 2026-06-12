@@ -4,6 +4,7 @@ import { PT_Sans, Dancing_Script } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/hooks/use-language';
+import { AuthProvider } from '@/hooks/use-auth';
 import GoogleAnalytics from '@/components/google-analytics';
 
 const ptSans = PT_Sans({
@@ -44,10 +45,12 @@ export default function RootLayout({
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
-        <LanguageProvider>
-          {children}
-          <Toaster />
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            {children}
+            <Toaster />
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );
