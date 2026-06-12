@@ -374,6 +374,27 @@ export default function PujoMap({
   const { location, mapCenter, status, locationDenied, getLocation } = useLocation();
   const { user, loading: authLoading } = useAuth();
 
+  // ── Auth loading timeout — avoid infinite spinner if Firebase is unreachable ──
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+  const authTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (authLoading && !authTimedOut) {
+      authTimeoutRef.current = setTimeout(() => {
+        setAuthTimedOut(true);
+      }, 5000);
+    } else if (!authLoading && authTimeoutRef.current) {
+      clearTimeout(authTimeoutRef.current);
+      authTimeoutRef.current = null;
+      setAuthTimedOut(false);
+    }
+    return () => {
+      if (authTimeoutRef.current) {
+        clearTimeout(authTimeoutRef.current);
+      }
+    };
+  }, [authLoading, authTimedOut]);
+
   // ── Location pill state machine ────────────────────────────────────────────
   const [locationPillState, setLocationPillState] = useState<LocationPillState>("hidden");
   const pillDismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -447,6 +468,26 @@ export default function PujoMap({
 
   // ── Auth Gate ─────────────────────────────────────────────────────────────
   if (authLoading) {
+    // Show a timeout message instead of infinite spinner after 5s
+    if (authTimedOut) {
+      return (
+        <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-4 p-4 animate-fade-in">
+          <h1 className="font-calligraphy text-4xl text-primary drop-shadow-sm">
+            Pujo<span className="text-foreground">পথ</span>
+          </h1>
+          <p className="text-sm text-muted-foreground text-center max-w-xs">
+            {text.authLoadingTimeout}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-transform active:scale-95"
+          >
+            {text.retry}
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className="flex h-full w-full items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />

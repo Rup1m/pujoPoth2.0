@@ -18,7 +18,11 @@ export type AnalyticsEvent =
   | 'filter_applied'
   | 'filter_cleared'
   | 'directions_requested'
-  | 'language_switched';
+  | 'language_switched'
+  | 'auth_success'
+  | 'auth_failed'
+  | 'auth_popup_blocked_fallback'
+  | 'auth_sign_out';
 
 /**
  * Fire a GA4 custom event. Safely no-ops when:

@@ -33,6 +33,25 @@ export const locales = {
     installAppDescription: 'Access Pujoपথ directly from your home screen',
     install: 'Install',
     close: 'Close',
+
+    // Auth
+    tagline: 'Your Smart Guide to Durga Puja Pandals',
+    authWelcome: 'Welcome / স্বাগতম',
+    authSubtitle: 'Sign in to track your pandal visits and earn achievements!',
+    signInWithGoogle: 'Sign in with Google',
+    signingIn: 'Signing in...',
+    completingSignIn: 'Completing sign-in...',
+    authErrorGeneric: 'Failed to sign in. Please try again.',
+    authErrorNetwork: 'No internet connection. Please check your network.',
+    authErrorTooManyRequests: 'Too many attempts. Please wait a moment and try again.',
+    authErrorAccountDisabled: 'This account has been disabled. Please contact support.',
+    authErrorPopupBlocked: 'Pop-up blocked. Redirecting you to sign in...',
+    offlineMessage: 'You are offline',
+    retry: 'Try Again',
+    signOut: 'Sign Out',
+    signingOut: 'Signing out...',
+    authLoadingTimeout: 'Having trouble connecting. Please check your internet and try again.',
+    account: 'Account',
   },
   bn: {
     // Search
@@ -67,6 +86,25 @@ export const locales = {
     installAppDescription: 'আপনার হোম স্ক্রীন থেকে সরাসরি পুজোপথ অ্যাক্সেস করুন',
     install: 'ইনস্টল করুন',
     close: 'বন্ধ করুন',
+
+    // Auth
+    tagline: 'দুর্গা পুজো প্যান্ডেলের স্মার্ট গাইড',
+    authWelcome: 'স্বাগতম / Welcome',
+    authSubtitle: 'সাইন ইন করুন আপনার প্যান্ডেল ভিজিট ট্র্যাক করতে এবং অ্যাচিভমেন্ট অর্জন করতে!',
+    signInWithGoogle: 'Google দিয়ে সাইন ইন করুন',
+    signingIn: 'সাইন ইন হচ্ছে...',
+    completingSignIn: 'সাইন ইন সম্পন্ন হচ্ছে...',
+    authErrorGeneric: 'সাইন ইন করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+    authErrorNetwork: 'ইন্টারনেট সংযোগ নেই। অনুগ্রহ করে আপনার নেটওয়ার্ক পরীক্ষা করুন।',
+    authErrorTooManyRequests: 'অনেক বেশি চেষ্টা। অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করে আবার চেষ্টা করুন।',
+    authErrorAccountDisabled: 'এই অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে। অনুগ্রহ করে সহায়তায় যোগাযোগ করুন।',
+    authErrorPopupBlocked: 'পপ-আপ ব্লক হয়েছে। সাইন ইন করতে রিডাইরেক্ট করা হচ্ছে...',
+    offlineMessage: 'আপনি অফলাইনে আছেন',
+    retry: 'আবার চেষ্টা করুন',
+    signOut: 'সাইন আউট',
+    signingOut: 'সাইন আউট হচ্ছে...',
+    authLoadingTimeout: 'সংযোগ করতে সমস্যা হচ্ছে। অনুগ্রহ করে আপনার ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করুন।',
+    account: 'অ্যাকাউন্ট',
   },
 };
 
