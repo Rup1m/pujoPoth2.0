@@ -1,6 +1,7 @@
 
 import type {Metadata} from 'next';
 import { PT_Sans, Dancing_Script } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/hooks/use-language';
@@ -43,6 +44,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <AuthProvider>

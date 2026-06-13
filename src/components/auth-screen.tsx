@@ -5,9 +5,9 @@ import { useLanguage } from "@/hooks/use-language";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, WifiOff, RefreshCw } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-// ── Google "G" logo (official colors, inline SVG) ────────────────────────────
+// ── Google "G" logo (official colors, inline SVG) — used in fallback button ──
 
 function GoogleLogo({ className }: { className?: string }) {
   return (
@@ -23,14 +23,28 @@ function GoogleLogo({ className }: { className?: string }) {
 // ── Main component ───────────────────────────────────────────────────────────
 
 export function AuthScreen() {
-  const { signInWithGoogle, authError, isSigningIn, isRedirectPending, clearError } = useAuth();
+  const {
+    initGoogleSignIn,
+    signInWithPopupFallback,
+    authError,
+    isSigningIn,
+    isGisReady,
+    gisLoadFailed,
+    clearError,
+  } = useAuth();
   const { text } = useLanguage();
   const [isOffline, setIsOffline] = useState(false);
+
+  // Ref for the container where GIS will render the branded button.
+  // Never conditionally unmounted so GIS can always access it.
+  const buttonContainerRef = useRef<HTMLDivElement>(null);
+
+  // Track whether initial GIS init has been attempted
+  const initAttemptedRef = useRef(false);
 
   // ── Offline detection ───────────────────────────────────────────────────
 
   useEffect(() => {
-    // Initial state
     setIsOffline(!navigator.onLine);
 
     const handleOnline = () => setIsOffline(false);
@@ -45,34 +59,20 @@ export function AuthScreen() {
     };
   }, []);
 
-  // ── Determine button state & text ──────────────────────────────────────
+  // ── Initialize GIS on mount ─────────────────────────────────────────────
+  // Uses requestAnimationFrame to guarantee the button container ref is
+  // attached to the DOM (eliminates the fragile 100ms setTimeout).
 
-  const isDisabled = isSigningIn || isRedirectPending || isOffline;
+  useEffect(() => {
+    if (isOffline || initAttemptedRef.current) return;
 
-  const getButtonContent = () => {
-    if (isRedirectPending) {
-      return (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>{text.completingSignIn}</span>
-        </>
-      );
-    }
-    if (isSigningIn) {
-      return (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>{text.signingIn}</span>
-        </>
-      );
-    }
-    return (
-      <>
-        <GoogleLogo className="w-5 h-5" />
-        <span>{text.signInWithGoogle}</span>
-      </>
-    );
-  };
+    const rafId = requestAnimationFrame(() => {
+      initAttemptedRef.current = true;
+      initGoogleSignIn(buttonContainerRef.current);
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [initGoogleSignIn, isOffline]);
 
   // ── Map auth error category to localized message ───────────────────────
 
@@ -98,15 +98,22 @@ export function AuthScreen() {
 
   // ── Handlers ───────────────────────────────────────────────────────────
 
-  const handleSignIn = async () => {
+  const handleRetry = useCallback(() => {
     clearError();
-    await signInWithGoogle();
-  };
+    initAttemptedRef.current = false;
+    initGoogleSignIn(buttonContainerRef.current);
+  }, [clearError, initGoogleSignIn]);
 
-  const handleRetry = () => {
+  const handleFallbackSignIn = useCallback(async () => {
     clearError();
-    handleSignIn();
-  };
+    await signInWithPopupFallback();
+  }, [clearError, signInWithPopupFallback]);
+
+  // ── Derived state ─────────────────────────────────────────────────────
+
+  const showGisButton = !gisLoadFailed;
+  const showFallbackButton = gisLoadFailed && !isSigningIn;
+  const showLoader = !isGisReady && !gisLoadFailed && !isSigningIn;
 
   // ── Render ─────────────────────────────────────────────────────────────
 
@@ -144,16 +151,58 @@ export function AuthScreen() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {/* ── Sign-in button ── */}
-          <Button
-            id="auth-sign-in-button"
-            size="lg"
-            className="w-full text-md font-bold shadow-md transition-transform active:scale-95 flex items-center justify-center gap-2.5"
-            onClick={handleSignIn}
-            disabled={isDisabled}
-          >
-            {getButtonContent()}
-          </Button>
+          {/* ── Signing-in indicator ── */}
+          {isSigningIn && (
+            <div
+              className="flex items-center justify-center gap-2 py-3 text-muted-foreground animate-fade-in"
+              role="status"
+              aria-label={text.signingIn}
+            >
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm font-medium">{text.signingIn}</span>
+            </div>
+          )}
+
+          {/* ── GIS "Sign In With Google" button container ──
+               Always mounted (never conditionally removed) so GIS can
+               render into it. Hidden via CSS when not in use. ── */}
+          <div
+            id="auth-gis-button-container"
+            ref={buttonContainerRef}
+            className="flex items-center justify-center min-h-[44px] transition-opacity duration-300"
+            style={{
+              opacity: isGisReady && !isSigningIn ? 1 : 0,
+              // Collapse when hidden so it doesn't take space
+              height: showGisButton && !isSigningIn ? undefined : 0,
+              overflow: "hidden",
+            }}
+            aria-hidden={!isGisReady || isSigningIn}
+          />
+
+          {/* ── Fallback button (ad-blocker / WebView) ── */}
+          {showFallbackButton && (
+            <Button
+              id="auth-fallback-sign-in-button"
+              size="lg"
+              className="w-full text-md font-bold shadow-md transition-transform active:scale-95 flex items-center justify-center gap-2.5 animate-fade-in"
+              onClick={handleFallbackSignIn}
+              disabled={isOffline}
+            >
+              <GoogleLogo className="w-5 h-5" />
+              <span>{text.signInWithGoogle}</span>
+            </Button>
+          )}
+
+          {/* ── Loading placeholder while GIS loads ── */}
+          {showLoader && (
+            <div
+              className="flex items-center justify-center gap-2 py-2 text-muted-foreground animate-fade-in"
+              role="status"
+            >
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-xs">{text.completingSignIn}</span>
+            </div>
+          )}
 
           {/* ── Error message with retry ── */}
           {errorMessage && (
