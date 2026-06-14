@@ -52,6 +52,21 @@ export const locales = {
     signingOut: 'Signing out...',
     authLoadingTimeout: 'Having trouble connecting. Please check your internet and try again.',
     account: 'Account',
+    // Dashboard / Gamification
+    pujoProgress: 'Pujo Progress',
+    complete: 'complete',
+    moreToUnlock: 'more to unlock',
+    achievements: 'Achievements',
+    zoneMastery: 'Zone Mastery',
+    north: 'North',
+    south: 'South',
+    central: 'Central',
+    pandalsVisited: 'pandals visited',
+    achievementUnlocked: 'Achievement Unlocked!',
+    markedVisited: 'Marked as visited ✓',
+    removedFromVisited: 'Removed from visited',
+    locked: 'Locked',
+    earned: 'Earned',
   },
   bn: {
     // Search
@@ -105,6 +120,21 @@ export const locales = {
     signingOut: 'সাইন আউট হচ্ছে...',
     authLoadingTimeout: 'সংযোগ করতে সমস্যা হচ্ছে। অনুগ্রহ করে আপনার ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করুন।',
     account: 'অ্যাকাউন্ট',
+    // Dashboard / Gamification
+    pujoProgress: 'পুজো অগ্রগতি',
+    complete: 'সম্পন্ন',
+    moreToUnlock: 'আরো দেখুন আনলক করতে',
+    achievements: 'অ্যাচিভমেন্ট',
+    zoneMastery: 'জোন মাস্টারি',
+    north: 'উত্তর',
+    south: 'দক্ষিণ',
+    central: 'মধ্য',
+    pandalsVisited: 'প্যান্ডেল দেখা হয়েছে',
+    achievementUnlocked: 'অ্যাচিভমেন্ট আনলক!',
+    markedVisited: 'দেখা হয়েছে বলে চিহ্নিত ✓',
+    removedFromVisited: 'দেখা থেকে সরানো হয়েছে',
+    locked: 'লক করা',
+    earned: 'অর্জিত',
   },
 };
 

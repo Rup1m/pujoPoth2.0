@@ -330,6 +330,8 @@ function MapCore({ location, locationDenied, locationPillState, initialPandals, 
         onFilterChange={handleFilterChange}
         isAboutOpen={isAboutOpen}
         onAboutOpenChange={setIsAboutOpen}
+        visitedIds={visitedIds}
+        allPandals={initialPandals}
       />
 
       {/* Location denied banner */}

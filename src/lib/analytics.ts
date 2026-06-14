@@ -22,7 +22,12 @@ export type AnalyticsEvent =
   | 'auth_success'
   | 'auth_failed'
   | 'auth_popup_blocked_fallback'
-  | 'auth_sign_out';
+  | 'auth_sign_out'
+  // Gamification events
+  | 'pandal_visited'
+  | 'pandal_unvisited'
+  | 'achievement_unlocked'
+  | 'account_panel_opened';
 
 /**
  * Fire a GA4 custom event. Safely no-ops when:

@@ -146,6 +146,10 @@ export default {
         'fade-in-up': 'fade-in-up 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) forwards',
         'smooth-reveal': 'smooth-reveal 2.2s cubic-bezier(0.7, 0, 0.3, 1) forwards',
         'road-flow': 'road-flow 1s linear infinite',
+        // Gamification animations
+        'scale-bounce': 'scale-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'achievement-pop': 'achievement-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
     },
   },
