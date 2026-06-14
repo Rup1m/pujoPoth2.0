@@ -67,6 +67,9 @@ export const locales = {
     removedFromVisited: 'Removed from visited',
     locked: 'Locked',
     earned: 'Earned',
+    visitedPandalsList: 'Visited Pandals',
+    noVisitedYet: 'No pandals visited yet. Go explore!',
+    visitedFilter: 'Visited',
   },
   bn: {
     // Search
@@ -135,6 +138,9 @@ export const locales = {
     removedFromVisited: 'দেখা থেকে সরানো হয়েছে',
     locked: 'লক করা',
     earned: 'অর্জিত',
+    visitedPandalsList: 'দেখা প্যান্ডেলের তালিকা',
+    noVisitedYet: 'এখনও কোনো প্যান্ডেল দেখা হয়নি। ঘুরে আসুন!',
+    visitedFilter: 'দেখা হয়েছে',
   },
 };
 

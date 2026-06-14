@@ -13,10 +13,13 @@ export interface Filters {
   central: boolean;
   bonedi: boolean;
   metro: boolean;
+  visited: boolean;
 }
 
 interface FilterPanelProps {
   onFilterChange: (filters: Filters) => void;
+  isBn: boolean;
+  text: Record<string, string>;
 }
 
 const initialFilters: Filters = {
@@ -25,6 +28,7 @@ const initialFilters: Filters = {
     central: false,
     bonedi: false,
     metro: false,
+    visited: false,
 };
 
 const STORAGE_KEY = 'pujopoth_filters';
@@ -38,6 +42,7 @@ function getSavedFilters(): Filters {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
+      // Ensure visited is included in case of older saved state
       return { ...initialFilters, ...parsed };
     }
   } catch {
@@ -65,7 +70,7 @@ function countActiveFilters(filters: Filters): number {
   return Object.values(filters).filter(Boolean).length;
 }
 
-function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
+function FilterPanelComponent({ onFilterChange, isBn, text }: FilterPanelProps) {
   const [filters, setFilters] = useState<Filters>(() => getSavedFilters());
   const [isOpen, setIsOpen] = useState(false);
 
@@ -99,22 +104,28 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
       // Set the selected zone if checking
       if (isChecking) {
         newFilters[filterName as 'north' | 'south' | 'central'] = true;
-        // Bonedi can coexist with zone filters
-        // (don't reset bonedi here)
+        // Bonedi and Visited can coexist with zone filters
       }
     } else if (filterName === 'bonedi') {
-      // Bonedi is compatible with zones but not metro
+      // Bonedi is compatible with zones/visited but not metro
       newFilters.bonedi = isChecking;
       if (isChecking && filters.metro) {
-        newFilters.metro = false; // Can't be bonedi and metro
+        newFilters.metro = false;
+      }
+    } else if (filterName === 'visited') {
+      // Visited is compatible with zones/bonedi but not metro
+      newFilters.visited = isChecking;
+      if (isChecking && filters.metro) {
+        newFilters.metro = false;
       }
     } else if (filterName === 'metro') {
-      // Metro is exclusive - clears zone filters and bonedi
+      // Metro is exclusive - clears zone filters, bonedi, and visited
       if (isChecking) {
         newFilters.north = false;
         newFilters.south = false;
         newFilters.central = false;
         newFilters.bonedi = false;
+        newFilters.visited = false;
       }
       newFilters.metro = isChecking;
     }
@@ -131,7 +142,7 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
   const activeFilterCount = countActiveFilters(filters);
   const hasActiveFilters = activeFilterCount > 0;
 
-  const FilterPill = ({ id, label, icon: Icon }: { id: keyof Filters; label: string; icon?: React.ElementType }) => {
+  const FilterPill = ({ id, label, icon: Icon, isSpecial }: { id: keyof Filters; label: string; icon?: React.ElementType, isSpecial?: boolean }) => {
     const isActive = filters[id];
     return (
       <button
@@ -139,10 +150,18 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
         onClick={() => handleCheckboxChange(id)}
         className={`flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 active:scale-95 ${
           isActive 
-            ? 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300' 
+            ? isSpecial
+              ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400'
+              : 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300' 
             : 'bg-muted/40 text-muted-foreground hover:bg-muted/70'
         }`}
-        style={isActive ? { boxShadow: 'inset 0 0 0 1.5px rgba(251,146,60,0.6), 0 2px 8px rgba(251,146,60,0.2)' } : {}}
+        style={
+          isActive 
+            ? isSpecial
+              ? { boxShadow: 'inset 0 0 0 1.5px rgba(34,197,94,0.6), 0 2px 8px rgba(34,197,94,0.2)' }
+              : { boxShadow: 'inset 0 0 0 1.5px rgba(251,146,60,0.6), 0 2px 8px rgba(251,146,60,0.2)' } 
+            : {}
+        }
       >
         {Icon && <Icon className="h-4 w-4" />}
         {label}
@@ -187,10 +206,15 @@ function FilterPanelComponent({ onFilterChange }: FilterPanelProps) {
         </SheetHeader>
 
         <div className="grid grid-cols-2 gap-3 px-4">
+          {/* Gamification Filter */}
+          <div className="col-span-2">
+            <FilterPill id="visited" label={text.visitedFilter} isSpecial />
+          </div>
+
           {/* Zone Filters */}
-          <FilterPill id="north" label="North Kolkata" />
-          <FilterPill id="south" label="South Kolkata" />
-          <FilterPill id="central" label="Central Kolkata" />
+          <FilterPill id="north" label={isBn ? text.north : "North Kolkata"} />
+          <FilterPill id="south" label={isBn ? text.south : "South Kolkata"} />
+          <FilterPill id="central" label={isBn ? text.central : "Central Kolkata"} />
 
           {/* Bonedi Filter */}
           <FilterPill id="bonedi" label="Bonedi Bari" />

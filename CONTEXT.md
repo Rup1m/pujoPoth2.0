@@ -28,7 +28,28 @@
 ## 🚀 Upcoming Features (Final Product Launch)
 *Critical requirements for the next phase of development:*
 
-1. **Advanced Google Analytics (GA4):** 
+1. **Visited Pandals List (Accessible from Dashboard):**
+   - Users can currently see *how many* pandals they've visited (progress ring shows `37/95`), but they **cannot see *which* pandals** they've visited by name.
+   - Add a tappable/expandable section in the `UserAccountPanel` dashboard that reveals the full list of visited pandal names.
+   - **Design Principles:** Must not clutter the existing dashboard. Should feel like a natural extension — think Instagram's "Saved" collections or Pinterest's boards. Collapsible/expandable pattern so it doesn't overwhelm the progress ring and achievements on first glance.
+   - **UX Requirements:** Each visited pandal in the list should be tappable → navigates the map to that pandal and opens its PandalHub card. This creates a "revisit" loop that drives re-engagement. Show zone badge (North/South/Central) next to each name for quick scanning.
+   - **Important:** List must exclude metro stations. Sort by zone grouping or alphabetical for scannability.
+
+2. **"Visited" Filter on the Map:**
+   - Add a new filter option alongside the existing North/South/Central/Bonedi/Metro filters in the `FilterPanel`.
+   - When the **"Visited"** filter is active, the map displays **only** the pandals the user has marked as visited.
+   - This lets users see their personal "conquest map" — a powerful visual reward that creates a sense of completion and pride.
+   - **Technical:** The `getFilteredPandals()` service function and `Filters` type need to be extended with a `visited: boolean` field. The filter must cross-reference `visitedIds` against the pandal list.
+   - **UX:** The filter chip should feel distinct from zone filters — use a checkmark icon or visited-specific color to signal it's a personal filter, not a geographic one.
+
+3. **Vibrant Visited Marker Visuals on the Map:**
+   - Visited pandals must be **visually distinct** on the map from unvisited ones — creating a "coloring book" effect where users feel the map "filling up" as they visit more pandals.
+   - **Design Vision:** Unvisited pandals keep the current marker style. Visited pandals get a distinct visual treatment (e.g., glowing border, checkmark overlay, different marker color, or a subtle "completed" badge).
+   - **Psychology:** This taps into the **Zeigarnik Effect** (people remember uncompleted tasks) and **collection completionism** (Pokédex / stamp-collecting dopamine). Seeing a half-colored map creates urgency to "finish the set."
+   - **Performance:** Marker visual changes must be lightweight. Use SVG class toggling, not re-renders. The `visitedIds` set is already passed to `MapContainer` — extend `PandalMarker` to accept visited state.
+   - **Important:** Metro station markers must NEVER show visited state, regardless of any edge case.
+
+4. **Advanced Google Analytics (GA4):** 
    - Expand current base GA implementation to fetch and analyze user engagement data.
    - Track key product success metrics: Time spent in app, specific feature usage, user retention, and gamification engagement.
 

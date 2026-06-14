@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useEffect, useRef } from "react";
-import { LogOut, Loader2, Trophy, Star, Lock, MapPin } from "lucide-react";
+import { LogOut, Loader2, Trophy, Star, Lock, MapPin, MapPinCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -395,6 +395,57 @@ export const UserAccountPanel = memo(function UserAccountPanel({
                 );
               })}
             </div>
+          </div>
+
+          <Separator />
+
+          {/* ── Visited Pandals List ── */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-bold text-foreground flex items-center gap-1.5 px-1">
+              <MapPinCheck className="w-4 h-4 text-primary" />
+              {text.visitedPandalsList}
+              <span className="text-xs text-muted-foreground font-normal ml-auto">
+                {tracker.visitedPandals.length}
+              </span>
+            </h4>
+            
+            {tracker.visitedPandals.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-4 bg-muted/30 rounded-xl border border-dashed border-muted">
+                {text.noVisitedYet}
+              </p>
+            ) : (
+              <div className="max-h-64 overflow-y-auto pr-1 space-y-1.5 scrollbar-hide rounded-xl">
+                {tracker.visitedPandals.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => {
+                      onOpenChange(false); // Close the sheet
+                      // Use the existing event bus to select the pandal on the map
+                      window.dispatchEvent(
+                        new CustomEvent("pandalSelected", { detail: p })
+                      );
+                    }}
+                    className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40 hover:bg-muted/70 active:scale-[0.98] transition-all cursor-pointer border border-transparent hover:border-border"
+                  >
+                    <div className="min-w-0 pr-2">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {isBn ? p.name_bengali || p.name : p.name}
+                      </p>
+                      {p.bonedi && (
+                        <p className="text-[10px] text-primary font-medium mt-0.5">
+                          Bonedi Bari
+                        </p>
+                      )}
+                    </div>
+                    {p.zone && (
+                      <span className="shrink-0 text-[10px] font-bold bg-background text-muted-foreground px-2 py-0.5 rounded-full border shadow-sm">
+                        {isBn ? text[p.zone.toLowerCase() as keyof typeof text] : p.zone}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <Separator />

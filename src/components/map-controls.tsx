@@ -47,7 +47,7 @@ export const MapControls = memo(function MapControls({
   visitedIds,
   allPandals,
 }: MapControlsProps) {
-  const { text } = useLanguage();
+  const { text, language } = useLanguage();
   const { user, signOut } = useAuth();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -77,7 +77,7 @@ export const MapControls = memo(function MapControls({
   return (
     <>
       <div className="absolute top-20 right-4 z-10 flex flex-col items-end gap-y-3">
-        <FilterPanel onFilterChange={onFilterChange} />
+        <FilterPanel onFilterChange={onFilterChange} isBn={language === 'bn'} text={text as unknown as Record<string, string>} />
 
         <LanguageSwitcher />
 

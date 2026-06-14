@@ -116,6 +116,8 @@ export interface TrackerState {
   pandalsToNextTier: number;
   /** Per-zone visited / total breakdown. */
   zoneMastery: ZoneMastery[];
+  /** Full list of visited pandal objects, sorted newest first. */
+  visitedPandals: Pandal[];
 }
 
 /**
@@ -131,8 +133,10 @@ export function usePandalTracker(
 ): TrackerState {
   return useMemo(() => {
     // Build a set of actual pandal IDs (not metro)
-    const realPandals = allPandals.filter((p) => p.type !== "metro");
-    const realPandalIds = new Set(realPandals.map((p) => p.id));
+    const realPandalsMap = new Map(
+      allPandals.filter((p) => p.type !== "metro").map((p) => [p.id, p])
+    );
+    const realPandalIds = new Set(realPandalsMap.keys());
 
     // Only count visited IDs that correspond to real pandals
     const validVisitedIds = Array.from(visitedIds).filter((id) =>
@@ -140,6 +144,11 @@ export function usePandalTracker(
     );
     const validVisitedCount = validVisitedIds.length;
     const validVisitedSet = new Set(validVisitedIds);
+
+    // Build the ordered list of visited pandals (newest first)
+    const visitedPandalsList = validVisitedIds
+      .map((id) => realPandalsMap.get(id)!)
+      .reverse();
 
     const progressPercent = Math.min(
       Math.round((validVisitedCount / TOTAL_PANDALS) * 100),
@@ -165,7 +174,8 @@ export function usePandalTracker(
     // ── Zone mastery ──────────────────────────────────────────────────────
     const zones: ("North" | "South" | "Central")[] = ["North", "South", "Central"];
     const zoneMastery: ZoneMastery[] = zones.map((zone) => {
-      const zonePandals = realPandals.filter((p) => p.zone === zone);
+      // Find pandals matching this zone from the map
+      const zonePandals = Array.from(realPandalsMap.values()).filter((p) => p.zone === zone);
       const zoneVisited = zonePandals.filter((p) => validVisitedSet.has(p.id)).length;
       const total = zonePandals.length;
       return {
@@ -184,6 +194,7 @@ export function usePandalTracker(
       earnedAchievements,
       pandalsToNextTier,
       zoneMastery,
+      visitedPandals: visitedPandalsList,
     };
   }, [visitedIds, allPandals]);
 }

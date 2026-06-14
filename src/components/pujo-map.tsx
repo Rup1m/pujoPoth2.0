@@ -261,7 +261,7 @@ function MapCore({ location, locationDenied, locationPillState, initialPandals, 
 
   const handleFilterChange = useCallback(
     (filters: Filters) => {
-      const filtered = getFilteredPandals(initialPandals, filters);
+      const filtered = getFilteredPandals(initialPandals, filters, visitedIds);
       const validFiltered = filtered.filter(
         (p) =>
           typeof p.latitude === "number" &&
@@ -279,7 +279,8 @@ function MapCore({ location, locationDenied, locationPillState, initialPandals, 
         filters.south ||
         filters.central ||
         filters.bonedi ||
-        filters.metro;
+        filters.metro ||
+        filters.visited;
       if (filtered.length === 0 && anyFilterActive) {
         toast({
           title: text.noPandalsFound,
@@ -288,7 +289,7 @@ function MapCore({ location, locationDenied, locationPillState, initialPandals, 
         });
       }
     },
-    [initialPandals, text.noPandalsFound, toast, clearDirections]
+    [initialPandals, text.noPandalsFound, toast, clearDirections, visitedIds]
   );
 
   // ── Render ────────────────────────────────────────────────────────────────

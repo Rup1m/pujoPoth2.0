@@ -70,16 +70,17 @@ export const getPandals = cache(async (): Promise<Pandal[]> => {
 
 export function getFilteredPandals(
   allPandals: Pandal[],
-  filters: Filters
+  filters: Filters,
+  visitedIds: Set<string>
 ): Pandal[] {
-    const { north, south, central, bonedi, metro } = filters;
+    const { north, south, central, bonedi, metro, visited } = filters;
     
     // If metro is selected, show only metro stations
     if (metro) {
         return allPandals.filter(pandal => pandal.type === 'metro');
     }
 
-    const noFiltersApplied = !north && !south && !central && !bonedi;
+    const noFiltersApplied = !north && !south && !central && !bonedi && !visited;
     
     if (noFiltersApplied) {
         // Return everything if no filters are on
@@ -87,7 +88,7 @@ export function getFilteredPandals(
     }
 
     return allPandals.filter(pandal => {
-        // Exclude metros from regular pandal filtering if any zone/bonedi filter is active
+        // Exclude metros from regular pandal filtering if any zone/bonedi/visited filter is active
         if (pandal.type === 'metro') {
             return false;
         }
@@ -100,6 +101,8 @@ export function getFilteredPandals(
 
         const bonediMatch = !bonedi || pandal.bonedi;
         
-        return zoneMatch && bonediMatch;
+        const visitedMatch = !visited || visitedIds.has(pandal.id);
+        
+        return zoneMatch && bonediMatch && visitedMatch;
     });
 }
