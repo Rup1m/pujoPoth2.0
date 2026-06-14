@@ -21,10 +21,10 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
     const size = 24;
     return (
         <div
-            className={`relative flex items-center justify-center will-change-transform transition-transform duration-150 ${
+            className={`relative flex items-center justify-center will-change-transform transition-transform duration-300 ease-out ${
               isSelected 
-                ? "scale-125 -translate-y-1 drop-shadow-lg z-50" 
-                : "hover:scale-110 hover:-translate-y-0.5"
+                ? "scale-125 -translate-y-1 drop-shadow-xl z-50" 
+                : "hover:scale-110 hover:-translate-y-1 active:scale-95"
             }`}
             style={{
                 width: size,
@@ -57,10 +57,10 @@ function PandalMarkerComponent({ isSelected, pandalType, isBonedi, isVisited }: 
   
   return (
     <div
-      className={`relative will-change-transform transition-transform duration-150 animate-marker-pop ${
+      className={`relative will-change-transform transition-transform duration-300 ease-out animate-marker-pop ${
         isSelected 
-          ? "scale-125 -translate-y-1 drop-shadow-lg z-50" 
-          : "hover:scale-110 hover:-translate-y-0.5"
+          ? "scale-125 -translate-y-1 drop-shadow-xl z-50" 
+          : "hover:scale-110 hover:-translate-y-1 active:scale-95"
       }`}
       style={{
         width: size,

@@ -85,7 +85,7 @@ export const MapControls = memo(function MapControls({
           onClick={onRecenter}
           variant="outline"
           size="icon"
-          className="bg-background/80 backdrop-blur-sm shadow-lg h-12 w-12 rounded-full border border-foreground/20"
+          className="bg-background/80 backdrop-blur-sm shadow-lg h-12 w-12 rounded-full border border-foreground/20 hover:bg-background transition-all duration-200 active:scale-95"
           aria-label={text.recenter}
         >
           <Navigation className="h-5 w-5 text-primary" />
@@ -96,7 +96,7 @@ export const MapControls = memo(function MapControls({
           <Button
             variant="outline"
             size="icon"
-            className="bg-background/80 backdrop-blur-sm shadow-lg h-12 w-12 rounded-full border border-foreground/20"
+            className="bg-background/80 backdrop-blur-sm shadow-lg h-12 w-12 rounded-full border border-foreground/20 hover:bg-background transition-all duration-200 active:scale-95"
             aria-label="About this App"
           >
             <Info className="h-5 w-5 text-primary" />

@@ -223,27 +223,29 @@ export function PandalHub({
                     </div>
 
                     <div className="absolute top-0 right-1 flex items-center gap-0.5">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleVisited(activePandal)}
-                        className="h-11 w-11 rounded-full"
-                      >
-                        {visitedIds.has(activePandal.id) ? (
-                          <MapPinCheck
-                            key={bounceKey}
-                            className="h-5 w-5 text-emerald-500 animate-scale-bounce"
-                            aria-label="Mark as not visited"
-                          />
-                        ) : (
-                          <MapPin className="h-5 w-5 text-muted-foreground" aria-label="Mark as visited" />
-                        )}
+                      {activePandal.type !== "metro" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleVisited(activePandal)}
+                          className="h-11 w-11 rounded-full hover:bg-muted/50 active:scale-90 transition-all duration-200"
+                        >
+                          {visitedIds.has(activePandal.id) ? (
+                            <MapPinCheck
+                              key={bounceKey}
+                              className="h-5 w-5 text-emerald-500 animate-scale-bounce drop-shadow-sm"
+                              aria-label="Mark as not visited"
+                            />
+                          ) : (
+                            <MapPin className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" aria-label="Mark as visited" />
+                          )}
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon" onClick={handleShare} className="h-11 w-11 rounded-full hover:bg-muted/50 active:scale-90 transition-all duration-200">
+                          <Share2 className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" aria-label="Share pandal" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={handleShare} className="h-11 w-11 rounded-full">
-                          <Share2 className="h-5 w-5 text-muted-foreground" aria-label="Share pandal" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={onClose} className="h-11 w-11 rounded-full">
-                          <X className="h-5 w-5 text-muted-foreground" />
+                      <Button variant="ghost" size="icon" onClick={onClose} className="h-11 w-11 rounded-full hover:bg-muted/50 active:scale-90 transition-all duration-200">
+                          <X className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
                       </Button>
                     </div>
                     
@@ -262,7 +264,7 @@ export function PandalHub({
                         <p className="text-xs text-muted-foreground text-center p-1">Directions unavailable</p>
                       ) : null}
                     </div>
-                     <Button onClick={handleNavigate} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-9 text-sm rounded-lg mt-1.5" disabled={!location}>
+                     <Button onClick={handleNavigate} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-9 text-sm rounded-lg mt-1.5 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow" disabled={!location}>
                         <Navigation className="mr-2 h-4 w-4" />
                         {text.getDirections}
                     </Button>
